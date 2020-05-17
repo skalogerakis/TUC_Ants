@@ -9,6 +9,9 @@ client: client.c board comm global.h
 server: server.c board comm gameServer global.h
 	gcc -o server server.c board.o comm.o gameServer.o -O3
 
+test: Linkedlist.c ListTester.c client.h global.h
+	gcc -o testOut ListTester.c client.h
+
 comm: comm.c comm.h global.h board move.h
 	gcc -c comm.c -O3
 
