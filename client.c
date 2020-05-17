@@ -254,6 +254,134 @@ Move initRandom(char myColor){
 }
 
 
+// void alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
+	
+// 	//check transposition table
+// 	Transp* curTransp= NULL;
+// 	if(((curTransp=retrieveTransposition(aPosition)) != NULL)&&(finalMove == NULL)){ //transposition found
+		
+		
+// 		//printf("Upperdepth: %d, lowerDepth: %d, currentDepth: %d\n", curTransp->upperDepth, curTransp->lowerDepth, depth);
+// 		if((curTransp->validity & 0x2)&&(curTransp->lowerBound >= beta)){
+// 			if(curTransp->lowerDepth >= depth){
+// 				hitsLower++;
+// 				return curTransp->lowerBound;
+// 			}
+// 		}
 
+// 		if((curTransp->validity & 0x2))
+// 			if(curTransp->lowerDepth >= depth)
+// 				alpha = max(alpha, curTransp->lowerBound);
+
+
+			
+// 		if((curTransp->validity & 0x4)&&(curTransp->upperBound <= alpha)){
+// 			if(curTransp->upperDepth >= depth){
+// 				hitsUpper++;
+// 				return curTransp->upperBound;
+// 			}
+// 		}
+
+
+
+
+// 		if((curTransp->validity & 0x4))
+// 			if(curTransp->upperDepth >= depth)
+// 				beta = min (beta, curTransp->upperBound);
+// 	}
+	
+
+// 	if (depth <= 0){ //if we reached the maximum depth of our recursion
+// 		if(!quiescenceSearch(aPosition)){ // and there are no captures we can see
+// 			return evalPosition(aPosition); //return heuristic
+// 		}
+		
+// 	}
+
+// 	list *moveList = findAllMoves(aPosition);   //finding all legal moves in this position
+// 	Move * tempData = NULL;
+
+
+// 	if (top(moveList) == NULL){     //If for any reason, no more moves are available
+// 		freeList(moveList);
+// 		return evalPosition(aPosition);
+// 	}
+
+// 	Position* tempPosition = malloc(sizeof(Position));
+// 	//Move *tempMove = malloc(sizeof(Move));
+// 	int tempScore, g;
+
+// 	int a, b;
+
+
+// 	if (maximizingPlayer){
+
+// 		g = -INFINITY;
+// 		a = alpha;
+// 		while((g<beta)&&((tempData = pop(moveList)) != NULL)){ //for each child position
+
+
+// 			memcpy(tempPosition, aPosition, sizeof(Position));
+// 			doMove(tempPosition, tempData);
+
+// 			tempScore = alpha_beta(tempPosition, depth-1, a, beta, 0, NULL);
+
+// 			//g = max(g, tempScore);
+			
+
+// 			if(g < tempScore){
+// 				g = tempScore;
+// 				if(finalMove != NULL){
+// 					//printf("%d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
+// 					memcpy(finalMove, tempData, sizeof(Move));
+// 				}
+// 			}
+// 			a = max(a, g);
+// 			//alpha = max(alpha, tempScore);
+// 			//if( beta <= alpha){ free(tempData); break;}
+// 			free(tempData);
+// 		}/*
+// 		freeList(moveList);
+// 		free(tempPosition);
+// 		saveTransposition(aPosition, alpha, depth);
+// 		//printf("alpha: %d\n", alpha);
+// 		return alpha;*/
+// 	}else{
+// 		g = INFINITY;
+// 		b = beta;
+// 		while((g>alpha)&&(tempData = pop(moveList)) != NULL){ //for each child position
+
+// 			memcpy(tempPosition, aPosition, sizeof(Position));
+// 			doMove(tempPosition, tempData);
+// 			//printf("Searching Move on depth %d:\n", depth);
+// 			//printMove(tempData);
+// 			tempScore = alpha_beta(tempPosition, depth-1, alpha, b, 1, NULL);
+			
+// 			g = min(g, tempScore);
+// 			b = min(b, g);
+
+// 			//if( beta <= alpha){ free(tempData); break;}
+// 			free(tempData);
+// 		}
+// 		/*
+// 		saveTransposition(aPosition, beta, depth);
+// 		//printf("%d\n", beta);
+// 		return beta;
+// 		*/
+// 	}
+
+// 	freeList(moveList);
+// 	free(tempPosition);
+	
+// 	// if(g <= alpha)
+// 	// 	saveUpperTransposition(aPosition, g, depth);
+// 	// if(g > alpha && g < beta)
+// 	// 	saveTransposition(aPosition, g, g, depth);
+// 	// if (g>= beta)
+// 	// 	saveLowerTransposition(aPosition, g, depth);
+	
+
+// 	return g;
+// }
 
 
