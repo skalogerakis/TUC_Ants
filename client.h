@@ -11,6 +11,9 @@
 //Move initRandom(char myColor);
 Move initRandom(char myColor, Position *aPosition);
 
+
+Move* newRandom(char myColor, Position *aPosition);
+
 LinkedList* moveFinder(Position *gamePosition);
 
 

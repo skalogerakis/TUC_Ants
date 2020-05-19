@@ -48,19 +48,21 @@ void printAvailableMoves(LinkedList *myList){
    }
 
    //Print everything starting from the start
-  //  while(ptr != NULL){
-		// printf("Element (%d)\n", ptr->data->);
-  //  		ptr = ptr->next;
-  //  }
-   printf("\n\nAll available moves\n");
+   while(ptr != NULL){
+   		int i=0;
+		while(ptr->data->tile[0][i] != -1){
+			if(i==0){
+				printf("\nInit Element pos (%d,%d)\n", ptr->data->tile[0][i], ptr->data->tile[1][i]);
+			}else{
+				printf("\tNext Element pos (%d,%d)\n", ptr->data->tile[0][1], ptr->data->tile[1][1]);
 
-   int i;
-	for (i = 0; i < MAXIMUM_MOVE_SIZE; i++){
-		if(ptr->data->tile[0][i] == -1)
-			break;
-		printf("%d %d\n", ptr->data->tile[0][i], ptr->data->tile[1][i]);
-		ptr = ptr->next;
-	}
+			}
+			
+			i++;
+		}
+
+   		ptr = ptr->next;
+   }
    
 }
 
