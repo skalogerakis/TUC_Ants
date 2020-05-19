@@ -103,18 +103,18 @@ int main( int argc, char ** argv )
 				}
 				else
 				{
-					short choice = 1;
+					// short choice = 1;
 
-					switch(choice){
-						case 1: 
-							myMove = initRandom(myColor);
-							printf("Random Choice 1\n");
-							break;
-						default:
-							myMove = initRandom(myColor);
-							printf("Default choice\n");
-							break;
-					}
+					// switch(choice){
+					// 	case 1: 
+							myMove = initRandom(myColor,&gamePosition);
+						// 	printf("Random Choice 1\n");
+						// 	break;
+						// default:
+						// 	myMove = initRandom(myColor);
+						// 	printf("Default choice\n");
+						// 	break;
+					// }
 					
 
 					//Move *tempMove = findMove(&gamePosition, 0/*initial depth*/);
@@ -142,12 +142,20 @@ int main( int argc, char ** argv )
 
 
 
-Move initRandom(char myColor){
+Move initRandom(char myColor, Position *aPosition){
 	/**********************************************************/
 // random player - not the most efficient implementation
 	int i, j, k;
 	int jumpPossible;
 	int playerDirection;
+
+	LinkedList *moves = moveFinder(aPosition);
+
+	printAvailableMoves(moves);
+
+	//deleteList(moves);
+
+
 
 	if( myColor == WHITE )		// find movement's direction
 		playerDirection = 1;
@@ -251,6 +259,86 @@ Move initRandom(char myColor){
 	return myMove;
 // end of random
 /**********************************************************/
+}
+
+LinkedList* moveFinder(Position *gamePosition){
+
+	int i, j, moveDirection, jumpPossible = 0;
+
+	LinkedList *mylinkedlist = (LinkedList*)malloc(sizeof(LinkedList));
+
+	LinkedListInitializer(mylinkedlist);
+
+	if( gamePosition->turn == WHITE )		// find movement's direction
+		moveDirection = 1;
+	else
+		moveDirection = -1;
+
+
+	//Start iterating through the board to track all available moves
+	for( i = 0; i < BOARD_ROWS; i++ )
+	{
+		for( j = 0; j < BOARD_COLUMNS; j++ )
+		{
+			if(gamePosition->board[i][j] != gamePosition->turn) continue;
+
+
+
+			// if( canJump( i, j, curColor, aPosition ) ){
+			// 	if(!jumpPossible)
+			// 		emptyList(moveList); //any simple moves are deleted
+			// 	move = malloc(sizeof(Move));
+			// 	move->color = curColor;
+			// 	recursiveFollowJump(moveList, move, 0, i, j, aPosition); //FOUND! IF MORE THAN ONE JUMP POSSIBLE THEN PUSHING THE SAME MALLOC'd move
+			// 	jumpPossible = TRUE;
+			// }
+
+			Move *tempMoveLeft;
+			Move *tempMoveRight;
+
+			//moveDirection = canJump(i, j, gamePosition->turn, gamePosition);
+			//TODO first work on simple case and then complicate things
+			if(!jumpPossible){	//check what statement here is needed
+				
+
+				tempMoveLeft = malloc(sizeof(Move));
+				tempMoveRight = malloc(sizeof(Move));
+				tempMoveLeft->tile[ 0 ][ 0 ] = i;		//piece we are going to move
+				tempMoveLeft->tile[ 1 ][ 0 ] = j;
+
+				tempMoveLeft->tile[ 0 ][ 1 ] = i + 1 * moveDirection;
+				tempMoveLeft->tile[ 0 ][ 2 ] = -1;
+
+				tempMoveLeft->tile[ 1 ][ 1 ] = j - 1;
+				if(isLegal(gamePosition, tempMoveLeft)){
+					printf("NEW MOVE %d %d\n", tempMoveLeft->tile[0][ 1 ], tempMoveLeft->tile[1][1] = j-1);
+					addElement(mylinkedlist, tempMoveLeft);}
+				else
+					free(tempMoveLeft);
+
+				tempMoveRight->tile[ 0 ][ 0 ] = i;		//piece we are going to move
+				tempMoveRight->tile[ 1 ][ 0 ] = j;
+
+				tempMoveRight->tile[ 0 ][ 1 ] = i + 1 * moveDirection;
+				tempMoveRight->tile[ 0 ][ 2 ] = -1;
+
+				tempMoveRight->tile[ 1 ][ 1 ] = j + 1;
+				if(isLegal(gamePosition, tempMoveRight)){
+					printf("NEW MOVE %d %d\n", tempMoveRight->tile[0][ 1 ], tempMoveRight->tile[1][1] = j-1);
+					addElement(mylinkedlist, tempMoveRight);}
+				else
+					free(tempMoveRight);
+
+				
+			}
+
+		}
+
+	}
+
+	//Todo add case no move
+
+	return mylinkedlist;
 }
 
 

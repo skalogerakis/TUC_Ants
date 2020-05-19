@@ -6,18 +6,22 @@ typedef struct LinkedList LinkedList;
 
 struct LinkedList
 {
-	int data;
+	Move* data;
 	struct LinkedList *next;
 	struct LinkedList *head;
 };
 
 
+
+// struct node *head;
+// struct node *current;
+
 void LinkedListInitializer(LinkedList *myList){
 	myList->head = NULL;
 	myList->next = NULL;
-	myList->data=-1;
 }
 
+//LEGACY: This will not work to print Move struct
 void printList(LinkedList *myList){
    LinkedList *ptr = myList->head;
 
@@ -28,9 +32,35 @@ void printList(LinkedList *myList){
 
    //Print everything starting from the start
    while(ptr != NULL){
-		printf("Element (%d)\n", ptr->data);
+		printf("Element (%d)\n", ptr->data->tile[0][0]);
    		ptr = ptr->next;
    }
+   
+}
+
+
+void printAvailableMoves(LinkedList *myList){
+   LinkedList *ptr = myList->head;
+
+   if(ptr == NULL){
+   	printf("List is empty\n");
+   	return;
+   }
+
+   //Print everything starting from the start
+  //  while(ptr != NULL){
+		// printf("Element (%d)\n", ptr->data->);
+  //  		ptr = ptr->next;
+  //  }
+   printf("\n\nAll available moves\n");
+
+   int i;
+	for (i = 0; i < MAXIMUM_MOVE_SIZE; i++){
+		if(ptr->data->tile[0][i] == -1)
+			break;
+		printf("%d %d\n", ptr->data->tile[0][i], ptr->data->tile[1][i]);
+		ptr = ptr->next;
+	}
    
 }
 
@@ -52,7 +82,7 @@ void deleteList(LinkedList *myList){
    	printf("List deleted successfully\n");
 }
 
-void addElement(LinkedList *myList ,int data){
+void addElement(LinkedList *myList ,Move* data){
 	LinkedList *newElem = (LinkedList*)malloc(sizeof(LinkedList));
 
 	newElem->data = data;
