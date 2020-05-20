@@ -12,7 +12,7 @@
 /**********************************************************/
 Position gamePosition;		// Position we are going to use
 
-Move moveReceived;			// temporary move to retrieve opponent's choice
+//Move moveReceived;			// temporary move to retrieve opponent's choice
 Move myMove;				// move to save our choice and send it to the server
 
 char myColor;				// to store our color
@@ -87,13 +87,6 @@ int main( int argc, char ** argv )
 				printf("My color is %d\n",myColor);
 				break;
 
-			case NM_PREPARE_TO_RECEIVE_MOVE:	//server informs us that he will send opponent's move
-				getMove( &moveReceived, mySocket );
-				moveReceived.color = getOtherSide( myColor );
-				doMove( &gamePosition, &moveReceived );		//play opponent's move on our position
-				printPosition( &gamePosition );
-				break;
-
 			case NM_REQUEST_MOVE:		//server requests our move
 				myMove.color = myColor;
 
@@ -131,13 +124,16 @@ int main( int argc, char ** argv )
 
 				sendMove( &myMove, mySocket );			//send our move
 				printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
-				doMove( &gamePosition, &myMove );		//play our move on our position
-				printPosition( &gamePosition );
+				//doMove( &gamePosition, &myMove );		//play our move on our position
+				//printPosition( &gamePosition );
 				
 				break;
 
 			case NM_QUIT:			//server wants us to quit...we shall obey
 				close( mySocket );
+				return 0;
+			default:
+				printf("Wrong Signal!\n");
 				return 0;
 		}
 
@@ -297,7 +293,7 @@ LinkedList* moveFinder(Position *gamePosition){
 
 				multipleJumps(mylinkedlist, jumpMove, gamePosition, i, j, 0); 
 				canJumpOver = 1;
-				continue;
+				//continue;
 			}
 	
 
@@ -353,6 +349,8 @@ LinkedList* moveFinder(Position *gamePosition){
 
 void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int i, int j,int k ){
 	
+	assert(MAXIMUM_MOVE_SIZE > k);
+
 	printf("Pos JUMP (%d, %d)\n", i,j);
 	int possibleJumps, playerDirection;
 
@@ -376,7 +374,8 @@ void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int
 		}else{
 
 			Move * altJumpMove = (Move *)malloc(sizeof(Move)); //create a duplicate move to follow the two different paths
-			altJumpMove = jumpMove;
+			//altJumpMove = jumpMove;
+			memcpy(altJumpMove, jumpMove, sizeof(Move));
 
 			multipleJumps(mylist, altJumpMove, gamePosition , i + 2 * playerDirection, j+2, k+1);
 			multipleJumps(mylist, jumpMove, gamePosition, i + 2 * playerDirection, j-2, k+1);

@@ -84,6 +84,24 @@ void deleteList(LinkedList *myList){
    	printf("List deleted successfully\n");
 }
 
+
+// void emptyList(LinkedList *myList){
+// 	LinkedList *ptrNext;
+
+//    	if(myList->head == NULL){
+//    		printf("List is empty\n");
+//    		return;
+//    	}
+
+//    	while(myList->head != NULL){
+// 		ptrNext = myList->head->next;
+// 		free(myList->head);
+//    		myList->head = ptrNext;
+//    	}
+
+//    	printf("All Elements in our List are empty\n");
+// }
+
 void addElement(LinkedList *myList ,Move* data){
 	LinkedList *newElem = (LinkedList*)malloc(sizeof(LinkedList));
 
