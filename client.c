@@ -289,12 +289,15 @@ LinkedList* moveFinder(Position *gamePosition){
 
 			if( canJump( i, j, gamePosition->turn, gamePosition ) ){
 				printf("JUMP POSSIBLE\n");
-				if(!canJumpOver && mylinkedlist != NULL) deleteList(mylinkedlist); //Assignment mentions that jump move have priority over simple. So we don't need simple in that case
 
 				jumpMove = (Move *)malloc(sizeof(Move));
 				jumpMove->color = gamePosition->turn;
+
+				if(!canJumpOver && mylinkedlist != NULL) deleteList(mylinkedlist); //Assignment mentions that jump move have priority over simple. So we don't need simple in that case
+
 				multipleJumps(mylinkedlist, jumpMove, gamePosition, i, j, 0); 
 				canJumpOver = 1;
+				continue;
 			}
 	
 

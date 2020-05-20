@@ -10,13 +10,13 @@
 /**********************************************************/
 Position gamePosition;		// Position we are going to use
 
-Move moveReceived;			// temporary move to retrieve opponent's choice
+//Move moveReceived;			// temporary move to retrieve opponent's choice
 Move myMove;				// move to save our choice and send it to the server
 
 char myColor;				// to store our color
 int mySocket;				// our socket
 
-char * agentName = "test!";		//default name.. change it! keep in mind MAX_NAME_LENGTH
+char * agentName = "MyAgent!";		//default name.. change it! keep in mind MAX_NAME_LENGTH
 
 char * ip = "127.0.0.1";	// default ip (local machine)
 /**********************************************************/
@@ -69,16 +69,19 @@ int main( int argc, char ** argv )
 	{
 
 		msg = recvMsg( mySocket );
-
+	
 		switch ( msg )
 		{
 			case NM_REQUEST_NAME:		//server asks for our name
 				sendName( agentName, mySocket );
+				
 				break;
 
 			case NM_NEW_POSITION:		//server is trying to send us a new position
+				
 				getPosition( &gamePosition, mySocket );
 				printPosition( &gamePosition );
+				
 				break;
 
 			case NM_COLOR_W:			//server indorms us that we have WHITE color
@@ -91,16 +94,12 @@ int main( int argc, char ** argv )
 				printf("My color is %d\n",myColor);
 				break;
 
-			case NM_PREPARE_TO_RECEIVE_MOVE:	//server informs us that he will send opponent's move
-				getMove( &moveReceived, mySocket );
-				moveReceived.color = getOtherSide( myColor );
-				doMove( &gamePosition, &moveReceived );		//play opponent's move on our position
-				printPosition( &gamePosition );
-				break;
+
 
 			case NM_REQUEST_MOVE:		//server requests our move
 				myMove.color = myColor;
-
+				
+				
 
 				if( !canMove( &gamePosition, myColor ) )
 				{
@@ -214,17 +213,21 @@ int main( int argc, char ** argv )
 /**********************************************************/
 
 				}
-
+			
+				
 				sendMove( &myMove, mySocket );			//send our move
-				//printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
-				doMove( &gamePosition, &myMove );		//play our move on our position
-				printPosition( &gamePosition );
 				
 				break;
 
 			case NM_QUIT:			//server wants us to quit...we shall obey
 				close( mySocket );
 				return 0;
+
+			default:
+				printf("Wrong Signal!\n");
+				return 0;
+
+			
 		}
 
 	} 

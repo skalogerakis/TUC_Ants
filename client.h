@@ -18,6 +18,8 @@ LinkedList* moveFinder(Position *gamePosition);
 
 void multipleJumps(LinkedList* moveList, Move* move, Position *gamePosition, int i, int j, int k );
 
+LinkedList* simpleMove(LinkedList *mylinkedlist,Position *gamePosition, int i, int j);
+
 
 
 

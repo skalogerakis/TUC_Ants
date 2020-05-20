@@ -15,6 +15,7 @@ typedef struct
 
 
 /**********************************************************/
+
 void initPosition( Position * pos );
 //initializes position
 

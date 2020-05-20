@@ -19,4 +19,4 @@ gameServer: gameServer.c gameServer.h board.h move.h global.h
 	gcc -c gameServer.c -O3
 
 clean:
-	rm -f *.o client server
+	rm -f *.o client server guiServer
