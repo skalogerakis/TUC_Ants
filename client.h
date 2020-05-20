@@ -16,6 +16,9 @@ Move* newRandom(char myColor, Position *aPosition);
 
 LinkedList* moveFinder(Position *gamePosition);
 
+void multipleJumps(LinkedList* moveList, Move* move, Position *gamePosition, int i, int j, int k );
+
+
 
 
 /************************************************
