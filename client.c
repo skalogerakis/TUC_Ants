@@ -9,6 +9,8 @@
 #include "client.h"
 #include <string.h>
 
+#define INFINITY 999999999
+#define MAX_DEPTH 5
 /**********************************************************/
 Position gamePosition;		// Position we are going to use
 
@@ -102,10 +104,11 @@ int main( int argc, char ** argv )
 
 					// switch(choice){
 					// 	case 1: 
+					//printf("Cur position evaluation: %d\n", evaluationFunction(&gamePosition));
 							myMove = initRandom(myColor,&gamePosition);
 						// 	printf("Random Choice 1\n");
 						// 	break;
-						// default:
+						// default: 
 						 	//myMove = initRandom(myColor);
 						// 	printf("Default choice\n");
 						// 	break;
@@ -114,7 +117,22 @@ int main( int argc, char ** argv )
 					// myMove = *tempMove;
 					// free(tempMove);
 
+
+
+
+
+					// int maxScore = -INFINITY;
+					// Move* myFinalMove = malloc(sizeof(Move));
+
+					// Position* tempPosition = malloc(sizeof(Position));
+					// memcpy(tempPosition, &gamePosition, sizeof(Position));
+
+					// maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, myFinalMove);
+
+					// myMove = *myFinalMove;
 					
+					// //free(tempPosition);
+					// printf("\t\tMAX SCORE %d\n", maxScore);
 
 					//Move *tempMove = findMove(&gamePosition, 0/*initial depth*/);
 					//myMove = *tempMove;
@@ -123,7 +141,7 @@ int main( int argc, char ** argv )
 				}
 
 				sendMove( &myMove, mySocket );			//send our move
-				printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
+				//printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
 				//doMove( &gamePosition, &myMove );		//play our move on our position
 				//printPosition( &gamePosition );
 				
@@ -270,7 +288,7 @@ LinkedList* moveFinder(Position *gamePosition){
 
 	LinkedList *mylinkedlist = (LinkedList*)malloc(sizeof(LinkedList));
 
-	LinkedListInitializer(mylinkedlist);
+	mylinkedlist = LinkedListInitializer(mylinkedlist);
 
 
 
@@ -281,10 +299,10 @@ LinkedList* moveFinder(Position *gamePosition){
 		{
 			if(gamePosition->board[i][j] != gamePosition->turn) continue;
 
-			Move *tempMoveLeft, *tempMoveRight, *jumpMove;	
+			Move *tempMoveLeft = NULL, *tempMoveRight = NULL, *jumpMove = NULL;	
 
 			if( canJump( i, j, gamePosition->turn, gamePosition ) ){
-				printf("JUMP POSSIBLE\n");
+				//printf("JUMP POSSIBLE\n");
 
 				jumpMove = (Move *)malloc(sizeof(Move));
 				jumpMove->color = gamePosition->turn;
@@ -304,6 +322,7 @@ LinkedList* moveFinder(Position *gamePosition){
 				want to track all the available moves in each position
 				*/
 				tempMoveLeft = (Move *)malloc(sizeof(Move));
+
 				
 				tempMoveLeft->color = gamePosition->turn;
 				tempMoveLeft->tile[0][0] = i;		//piece we are going to move
@@ -312,10 +331,10 @@ LinkedList* moveFinder(Position *gamePosition){
 				tempMoveLeft->tile[0][2] = -1;
 				tempMoveLeft->tile[1][1] = j - 1;
 
-				printf("INIT PLACE %d %d\n", tempMoveLeft->tile[0][0], tempMoveLeft->tile[1][0]);
+				//printf("INIT PLACE %d %d\n", tempMoveLeft->tile[0][0], tempMoveLeft->tile[1][0]);
 
 				if(isLegal(gamePosition, tempMoveLeft)){
-					printf("NEW MOVE %d %d\n", tempMoveLeft->tile[0][1], tempMoveLeft->tile[1][1]);
+					//printf("NEW MOVE %d %d\n", tempMoveLeft->tile[0][1], tempMoveLeft->tile[1][1]);
 					addElement(mylinkedlist, tempMoveLeft);}
 				else
 					free(tempMoveLeft);
@@ -329,7 +348,7 @@ LinkedList* moveFinder(Position *gamePosition){
 				tempMoveRight->tile[1][1] = j + 1;
 
 				if(isLegal(gamePosition, tempMoveRight)){
-					printf("NEW MOVE %d %d\n", tempMoveRight->tile[0][1], tempMoveRight->tile[1][1]);
+					//printf("NEW MOVE %d %d\n", tempMoveRight->tile[0][1], tempMoveRight->tile[1][1]);
 					addElement(mylinkedlist, tempMoveRight);}
 				else
 					free(tempMoveRight);
@@ -349,7 +368,7 @@ LinkedList* moveFinder(Position *gamePosition){
 
 void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int i, int j,int k ){
 	
-	assert(MAXIMUM_MOVE_SIZE > k);
+	//assert(MAXIMUM_MOVE_SIZE > k);
 
 	printf("Pos JUMP (%d, %d)\n", i,j);
 	int possibleJumps, playerDirection;
@@ -372,10 +391,10 @@ void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int
 			multipleJumps(mylist, jumpMove,  gamePosition, i + 2*playerDirection, j+2, k+1);
 			return;
 		}else{
-
+			//IMPORTANT: DONT ASSIGN RIGHT AWAY POINTERS, CAUSES SEGMENTATION FAULT. Use memmove instead
 			Move * altJumpMove = (Move *)malloc(sizeof(Move)); //create a duplicate move to follow the two different paths
 			//altJumpMove = jumpMove;
-			memcpy(altJumpMove, jumpMove, sizeof(Move));
+			memmove(altJumpMove, jumpMove, sizeof(Move));
 
 			multipleJumps(mylist, altJumpMove, gamePosition , i + 2 * playerDirection, j+2, k+1);
 			multipleJumps(mylist, jumpMove, gamePosition, i + 2 * playerDirection, j-2, k+1);
@@ -400,134 +419,185 @@ void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int
 }
 
 
-// void alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
-	
-// 	//check transposition table
-// 	Transp* curTransp= NULL;
-// 	if(((curTransp=retrieveTransposition(aPosition)) != NULL)&&(finalMove == NULL)){ //transposition found
-		
-		
-// 		//printf("Upperdepth: %d, lowerDepth: %d, currentDepth: %d\n", curTransp->upperDepth, curTransp->lowerDepth, depth);
-// 		if((curTransp->validity & 0x2)&&(curTransp->lowerBound >= beta)){
-// 			if(curTransp->lowerDepth >= depth){
-// 				hitsLower++;
-// 				return curTransp->lowerBound;
-// 			}
-// 		}
+int evaluationFunction (Position *aPosition) {
+    int i,j, evaluation = 0;
+    
+    for (i = 0; i < BOARD_ROWS; i++)
+    {
+        for ( j = 0; j < BOARD_COLUMNS; j++)
+        {
+            if (aPosition->board[i][j] == myColor){
+               evaluation += 100;
+               //printf("For piece in %d %d, of color: %d, we add...\n", i, j, myColor);
+               if(myColor == WHITE)
+               	evaluation += i*1;
+               else
+               	evaluation += (BOARD_ROWS-i-1)*1;
 
-// 		if((curTransp->validity & 0x2))
-// 			if(curTransp->lowerDepth >= depth)
-// 				alpha = max(alpha, curTransp->lowerBound);
+
+           	}
+            else if (aPosition->board[i][j] == getOtherSide(myColor)){
+               evaluation -= 100;
+               //printf("For piece in %d %d, of color: %d, we sub...\n", i, j, getOtherSide(myColor));
+               if(myColor == BLACK)
+               	evaluation -= i*1;
+               else
+               	evaluation -= (BOARD_ROWS-i-1)*1;
+           	}
+
+        }
+    }
+    evaluation = evaluation + aPosition->score[myColor]*90 - aPosition->score[getOtherSide(myColor)]*90;
+
+    return evaluation;
+}
+
+
+
+int max(int a, int b)
+{
+	if (a > b)
+		return a;
+	return b;
+}
+int min(int a, int b)
+{
+	if(a < b)
+		return a;
+	return b;
+}
+
+
+int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
+	
+	//check transposition table
+	// Transp* curTransp= NULL;
+	// if(((curTransp=retrieveTransposition(aPosition)) != NULL)&&(finalMove == NULL)){ //transposition found
+		
+		
+	// 	//printf("Upperdepth: %d, lowerDepth: %d, currentDepth: %d\n", curTransp->upperDepth, curTransp->lowerDepth, depth);
+	// 	if((curTransp->validity & 0x2)&&(curTransp->lowerBound >= beta)){
+	// 		if(curTransp->lowerDepth >= depth){
+	// 			hitsLower++;
+	// 			return curTransp->lowerBound;
+	// 		}
+	// 	}
+
+	// 	if((curTransp->validity & 0x2))
+	// 		if(curTransp->lowerDepth >= depth)
+	// 			alpha = max(alpha, curTransp->lowerBound);
 
 
 			
-// 		if((curTransp->validity & 0x4)&&(curTransp->upperBound <= alpha)){
-// 			if(curTransp->upperDepth >= depth){
-// 				hitsUpper++;
-// 				return curTransp->upperBound;
-// 			}
-// 		}
+	// 	if((curTransp->validity & 0x4)&&(curTransp->upperBound <= alpha)){
+	// 		if(curTransp->upperDepth >= depth){
+	// 			hitsUpper++;
+	// 			return curTransp->upperBound;
+	// 		}
+	// 	}
 
 
 
 
-// 		if((curTransp->validity & 0x4))
-// 			if(curTransp->upperDepth >= depth)
-// 				beta = min (beta, curTransp->upperBound);
-// 	}
+	// 	if((curTransp->validity & 0x4))
+	// 		if(curTransp->upperDepth >= depth)
+	// 			beta = min (beta, curTransp->upperBound);
+	//}
 	
 
-// 	if (depth <= 0){ //if we reached the maximum depth of our recursion
-// 		if(!quiescenceSearch(aPosition)){ // and there are no captures we can see
-// 			return evalPosition(aPosition); //return heuristic
-// 		}
+	if (depth <= 0){ //if we reached the maximum depth of our recursion
+		//if(!quiescenceSearch(aPosition)){ // and there are no captures we can see
+			return evaluationFunction(aPosition); //return heuristic
+		//}
 		
-// 	}
+	}
 
-// 	list *moveList = findAllMoves(aPosition);   //finding all legal moves in this position
-// 	Move * tempData = NULL;
-
-
-// 	if (top(moveList) == NULL){     //If for any reason, no more moves are available
-// 		freeList(moveList);
-// 		return evalPosition(aPosition);
-// 	}
-
-// 	Position* tempPosition = malloc(sizeof(Position));
-// 	//Move *tempMove = malloc(sizeof(Move));
-// 	int tempScore, g;
-
-// 	int a, b;
+	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
+	Move * tempData = NULL;
 
 
-// 	if (maximizingPlayer){
+	if (moveList == NULL || moveList->head->data == NULL){     //If for any reason, no more moves are available
+		//deleteList(moveList);
+		return evaluationFunction(aPosition);
+	}
 
-// 		g = -INFINITY;
-// 		a = alpha;
-// 		while((g<beta)&&((tempData = pop(moveList)) != NULL)){ //for each child position
+	Position* tempPosition = malloc(sizeof(Position));
+	//Move *tempMove = malloc(sizeof(Move));
+	int tempScore, g;
+
+	int a, b;
 
 
-// 			memcpy(tempPosition, aPosition, sizeof(Position));
-// 			doMove(tempPosition, tempData);
+	if (maximizingPlayer){
 
-// 			tempScore = alpha_beta(tempPosition, depth-1, a, beta, 0, NULL);
+		g = -INFINITY;
+		a = alpha;
+		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
 
-// 			//g = max(g, tempScore);
+			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
+			memcpy(tempPosition, aPosition, sizeof(Position));
+			doMove(tempPosition, tempData);
+
+			//printf("MAXIMIZER Searching Move on depth %d:\n", depth);
+
+			tempScore = alpha_beta(tempPosition, depth-1, a, beta, 0, NULL);
+
+			//g = max(g, tempScore);
 			
 
-// 			if(g < tempScore){
-// 				g = tempScore;
-// 				if(finalMove != NULL){
-// 					//printf("%d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
-// 					memcpy(finalMove, tempData, sizeof(Move));
-// 				}
-// 			}
-// 			a = max(a, g);
-// 			//alpha = max(alpha, tempScore);
-// 			//if( beta <= alpha){ free(tempData); break;}
-// 			free(tempData);
-// 		}/*
-// 		freeList(moveList);
-// 		free(tempPosition);
-// 		saveTransposition(aPosition, alpha, depth);
-// 		//printf("alpha: %d\n", alpha);
-// 		return alpha;*/
-// 	}else{
-// 		g = INFINITY;
-// 		b = beta;
-// 		while((g>alpha)&&(tempData = pop(moveList)) != NULL){ //for each child position
+			if(g < tempScore){
+				g = tempScore;
+				if(finalMove != NULL){
+					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
+					memcpy(finalMove, tempData, sizeof(Move));
+				}
+			}
+			a = max(a, g);
+			//alpha = max(alpha, tempScore);
+			//if( beta <= alpha){ free(tempData); break;}
+			free(tempData);
+		}/*
+		freeList(moveList);
+		free(tempPosition);
+		saveTransposition(aPosition, alpha, depth);
+		//printf("alpha: %d\n", alpha);
+		return alpha;*/
+	}else{
+		g = INFINITY;
+		b = beta;
+		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
 
-// 			memcpy(tempPosition, aPosition, sizeof(Position));
-// 			doMove(tempPosition, tempData);
-// 			//printf("Searching Move on depth %d:\n", depth);
-// 			//printMove(tempData);
-// 			tempScore = alpha_beta(tempPosition, depth-1, alpha, b, 1, NULL);
+			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
+
+			memcpy(tempPosition, aPosition, sizeof(Position));
+			doMove(tempPosition, tempData);
+			//printf("MINIMIZER Searching Move on depth %d:\n", depth);
+			//printMove(tempData);
+			tempScore = alpha_beta(tempPosition, depth-1, alpha, b, 1, NULL);
 			
-// 			g = min(g, tempScore);
-// 			b = min(b, g);
+			g = min(g, tempScore);
+			b = min(b, g);
 
-// 			//if( beta <= alpha){ free(tempData); break;}
-// 			free(tempData);
-// 		}
-// 		/*
-// 		saveTransposition(aPosition, beta, depth);
-// 		//printf("%d\n", beta);
-// 		return beta;
-// 		*/
-// 	}
+			//if( beta <= alpha){ free(tempData); break;}
+			free(tempData);
+		}
+		/*
+		saveTransposition(aPosition, beta, depth);
+		//printf("%d\n", beta);
+		return beta;
+		*/
+	}
 
-// 	freeList(moveList);
-// 	free(tempPosition);
+	//deleteList(moveList);
+	//free(tempPosition);
 	
-// 	// if(g <= alpha)
-// 	// 	saveUpperTransposition(aPosition, g, depth);
-// 	// if(g > alpha && g < beta)
-// 	// 	saveTransposition(aPosition, g, g, depth);
-// 	// if (g>= beta)
-// 	// 	saveLowerTransposition(aPosition, g, depth);
+	// if(g <= alpha)
+	// 	saveUpperTransposition(aPosition, g, depth);
+	// if(g > alpha && g < beta)
+	// 	saveTransposition(aPosition, g, g, depth);
+	// if (g>= beta)
+	// 	saveLowerTransposition(aPosition, g, depth);
 	
 
-// 	return g;
-// }
-
-
+	return g;
+}

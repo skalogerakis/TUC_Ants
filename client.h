@@ -20,7 +20,13 @@ void multipleJumps(LinkedList* moveList, Move* move, Position *gamePosition, int
 
 LinkedList* simpleMove(LinkedList *mylinkedlist,Position *gamePosition, int i, int j);
 
+int evaluationFunction (Position *aPosition);
 
+int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
+
+int max(int a, int b);
+
+int min(int a, int b);
 
 
 /************************************************
@@ -28,7 +34,7 @@ LinkedList* simpleMove(LinkedList *mylinkedlist,Position *gamePosition, int i, i
 	Simple Implementation of a typical linked list.
 ************************************************/
 //Initializes everything in LinkedList
-void LinkedListInitializer(LinkedList *myList);
+LinkedList* LinkedListInitializer(LinkedList *myList);
 
 //Prints the whole list
 void printList(LinkedList *myList);
@@ -43,6 +49,6 @@ void deleteList(LinkedList *myList);
 void addElement(LinkedList *myList ,Move *data);
 
 //Removes first element from list
-void removeFirst(LinkedList *myList );
+Move* removeFirst(LinkedList *myList );
 
 // void emptyList(LinkedList *myList);

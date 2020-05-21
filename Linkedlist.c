@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 //TODO data is int type. Change after test that works fine
 
 typedef struct LinkedList LinkedList;
@@ -16,9 +18,11 @@ struct LinkedList
 // struct node *head;
 // struct node *current;
 
-void LinkedListInitializer(LinkedList *myList){
+LinkedList* LinkedListInitializer(LinkedList *myList){
+	myList->data = NULL;
 	myList->head = NULL;
 	myList->next = NULL;
+	return myList;
 }
 
 //LEGACY: This will not work to print Move struct
@@ -70,7 +74,7 @@ void deleteList(LinkedList *myList){
 	LinkedList *ptrNext;
 
    	if(myList->head == NULL){
-   		printf("List is empty\n");
+   		//printf("List is empty\n");
    		return;
    	}
 
@@ -81,26 +85,9 @@ void deleteList(LinkedList *myList){
    	}
    	free(myList);
 
-   	printf("List deleted successfully\n");
+   	//printf("List deleted successfully\n");
 }
 
-
-// void emptyList(LinkedList *myList){
-// 	LinkedList *ptrNext;
-
-//    	if(myList->head == NULL){
-//    		printf("List is empty\n");
-//    		return;
-//    	}
-
-//    	while(myList->head != NULL){
-// 		ptrNext = myList->head->next;
-// 		free(myList->head);
-//    		myList->head = ptrNext;
-//    	}
-
-//    	printf("All Elements in our List are empty\n");
-// }
 
 void addElement(LinkedList *myList ,Move* data){
 	LinkedList *newElem = (LinkedList*)malloc(sizeof(LinkedList));
@@ -115,15 +102,55 @@ void addElement(LinkedList *myList ,Move* data){
 	myList->head = newElem; 
 }
 
-void removeFirst(LinkedList *myList ){
-	printf("Remove First Element\n");
-	LinkedList *initNode = myList->head;
+// Move* removeFirst(LinkedList *myList ){
+// 	printf("Remove First Element\n");
 
-	if(initNode == NULL){
-		printf("List empty\n");
-		return;
+// 	//printAvailableMoves(myList);
+// 	if(myList == NULL){
+// 		printf("List empty\n");
+// 		free(myList);
+// 		return NULL;
+// 	}
+
+// 	LinkedList *initNode = myList->head;
+
+// 	Move* returnData = malloc(sizeof(Move));
+
+// 	//returnData = myList->head->data;
+// 	memcpy(returnData,myList->head->data, sizeof(Move));
+
+// 	// if(initNode == NULL){
+// 	// 	printf("List empty\n");
+// 	// 	free(initNode);
+// 	// 	return NULL;
+// 	// }
+
+// 	myList->head = myList->head->next;
+// 	free(initNode);
+
+// 	return returnData;
+// }
+
+Move* removeFirst(LinkedList *myList ){
+	//printf("Remove First Element\n");
+
+	//printAvailableMoves(myList);
+	if(myList == NULL || myList->head == NULL){
+		//printf("List empty\n");
+		return NULL;
 	}
 
+	Move* returnMove = malloc(sizeof(Move));
+
+	LinkedList *temp = myList->head;
+
+	memmove(returnMove,temp->data,sizeof(Move));
+
 	myList->head = myList->head->next;
-	free(initNode);
+
+	// returnMove = temp->data;
+	//memmove(returnMove,temp->data,sizeof(Move));
+	//free(temp);
+
+	return returnMove;
 }
