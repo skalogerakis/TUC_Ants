@@ -26,27 +26,27 @@ LinkedList* LinkedListInitializer(LinkedList *myList){
 }
 
 //LEGACY: This will not work to print Move struct
-void printList(LinkedList *myList){
-   LinkedList *ptr = myList->head;
+// void printList(LinkedList *myList){
+//    LinkedList *ptr = myList->head;
 
-   if(ptr == NULL){
-   	printf("List is empty\n");
-   	return;
-   }
+//    if(ptr == NULL){
+//    	printf("List is empty\n");
+//    	return;
+//    }
 
-   //Print everything starting from the start
-   while(ptr != NULL){
-		printf("Element (%d)\n", ptr->data->tile[0][0]);
-   		ptr = ptr->next;
-   }
+//    //Print everything starting from the start
+//    while(ptr != NULL){
+// 		printf("Element (%d)\n", ptr->data->tile[0][0]);
+//    		ptr = ptr->next;
+//    }
    
-}
+// }
 
 
 void printAvailableMoves(LinkedList *myList){
    LinkedList *ptr = myList->head;
 
-   if(ptr == NULL){
+   if(ptr == NULL || myList == NULL){
    	printf("List is empty\n");
    	return;
    }
@@ -73,17 +73,34 @@ void printAvailableMoves(LinkedList *myList){
 void deleteList(LinkedList *myList){
 	LinkedList *ptrNext;
 
-   	if(myList->head == NULL){
+   	if(myList->head == NULL || myList == NULL){
    		//printf("List is empty\n");
    		return;
    	}
 
    	while(myList->head != NULL){
 		ptrNext = myList->head->next;
-		free(myList->head);
+		//free(myList->head);
    		myList->head = ptrNext;
    	}
    	free(myList);
+
+   	//printf("List deleted successfully\n");
+}
+
+void emptyList(LinkedList *myList){
+	LinkedList *ptrNext;
+
+   	if(myList->head == NULL || myList == NULL){
+   		printf("List is empty\n");
+   		return;
+   	}
+
+   	while(myList->head != NULL){
+		ptrNext = myList->head->next;
+		//free(myList->head);
+   		myList->head = ptrNext;
+   	}
 
    	//printf("List deleted successfully\n");
 }
@@ -100,6 +117,7 @@ void addElement(LinkedList *myList ,Move* data){
 
 	newElem->next = myList->head;
 	myList->head = newElem; 
+	//free(newElem);
 }
 
 // Move* removeFirst(LinkedList *myList ){
@@ -147,6 +165,9 @@ Move* removeFirst(LinkedList *myList ){
 	memmove(returnMove,temp->data,sizeof(Move));
 
 	myList->head = myList->head->next;
+	//printf("INIT PLACE %d %d\n", tempMoveLeft->tile[0][0], tempMoveLeft->tile[1][0]);
+
+	//printf("Remove element starting (%d,%d) and next head (%d,%d)\n", );
 
 	// returnMove = temp->data;
 	//memmove(returnMove,temp->data,sizeof(Move));

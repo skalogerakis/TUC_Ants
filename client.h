@@ -51,4 +51,4 @@ void addElement(LinkedList *myList ,Move *data);
 //Removes first element from list
 Move* removeFirst(LinkedList *myList );
 
-// void emptyList(LinkedList *myList);
+void emptyList(LinkedList *myList);

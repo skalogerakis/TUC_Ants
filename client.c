@@ -105,7 +105,7 @@ int main( int argc, char ** argv )
 					// switch(choice){
 					// 	case 1: 
 					//printf("Cur position evaluation: %d\n", evaluationFunction(&gamePosition));
-							myMove = initRandom(myColor,&gamePosition);
+							//myMove = initRandom(myColor,&gamePosition);
 						// 	printf("Random Choice 1\n");
 						// 	break;
 						// default: 
@@ -121,18 +121,19 @@ int main( int argc, char ** argv )
 
 
 
-					// int maxScore = -INFINITY;
-					// Move* myFinalMove = malloc(sizeof(Move));
+					int maxScore = -INFINITY;
+					//Move* myFinalMove = malloc(sizeof(Move));
 
-					// Position* tempPosition = malloc(sizeof(Position));
-					// memcpy(tempPosition, &gamePosition, sizeof(Position));
+					Position* tempPosition = malloc(sizeof(Position));
+					memcpy(tempPosition, &gamePosition, sizeof(Position));
 
-					// maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, myFinalMove);
+					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
 
-					// myMove = *myFinalMove;
-					
-					// //free(tempPosition);
-					// printf("\t\tMAX SCORE %d\n", maxScore);
+					//myMove = *myFinalMove;
+
+					//free(myFinalMove);
+					//free(tempPosition);
+					printf("\t\tMAX SCORE %d\n", maxScore);
 
 					//Move *tempMove = findMove(&gamePosition, 0/*initial depth*/);
 					//myMove = *tempMove;
@@ -173,7 +174,7 @@ Move initRandom(char myColor, Position *aPosition){
 
 	printAvailableMoves(moves);
 
-	//deleteList(moves);
+	removeFirst(moves);
 
 
 
@@ -290,7 +291,7 @@ LinkedList* moveFinder(Position *gamePosition){
 
 	mylinkedlist = LinkedListInitializer(mylinkedlist);
 
-
+	//Move *tempMoveLeft = NULL, *tempMoveRight = NULL, *jumpMove = NULL;	
 
 	//Start iterating through the board to track all available moves
 	for( i = 0; i < BOARD_ROWS; i++ )
@@ -299,15 +300,18 @@ LinkedList* moveFinder(Position *gamePosition){
 		{
 			if(gamePosition->board[i][j] != gamePosition->turn) continue;
 
-			Move *tempMoveLeft = NULL, *tempMoveRight = NULL, *jumpMove = NULL;	
+			
 
 			if( canJump( i, j, gamePosition->turn, gamePosition ) ){
 				//printf("JUMP POSSIBLE\n");
 
-				jumpMove = (Move *)malloc(sizeof(Move));
+				Move *jumpMove = (Move *)malloc(sizeof(Move));
+				//jumpMove =NULL;
+				memset(jumpMove,0,sizeof(Move));
 				jumpMove->color = gamePosition->turn;
+				//jumpMove->tile[0][0]
 
-				if(!canJumpOver && mylinkedlist != NULL) deleteList(mylinkedlist); //Assignment mentions that jump move have priority over simple. So we don't need simple in that case
+				if(!canJumpOver) emptyList(mylinkedlist); //Assignment mentions that jump move have priority over simple. So we don't need simple in that case
 
 				multipleJumps(mylinkedlist, jumpMove, gamePosition, i, j, 0); 
 				canJumpOver = 1;
@@ -321,7 +325,7 @@ LinkedList* moveFinder(Position *gamePosition){
 				We create space for right and left moves otherwise it overwites.Remember here we simply
 				want to track all the available moves in each position
 				*/
-				tempMoveLeft = (Move *)malloc(sizeof(Move));
+				Move *tempMoveLeft = (Move *)malloc(sizeof(Move));
 
 				
 				tempMoveLeft->color = gamePosition->turn;
@@ -339,7 +343,8 @@ LinkedList* moveFinder(Position *gamePosition){
 				else
 					free(tempMoveLeft);
 
-				tempMoveRight = (Move *)malloc(sizeof(Move));
+				Move* tempMoveRight = (Move *)malloc(sizeof(Move));
+
 				tempMoveRight->color = gamePosition->turn;
 				tempMoveRight->tile[0][0] = i;		//piece we are going to move
 				tempMoveRight->tile[1][0] = j;
@@ -360,6 +365,15 @@ LinkedList* moveFinder(Position *gamePosition){
 
 	}
 
+	if(mylinkedlist == NULL){
+		Move* jumpMove = malloc(sizeof(Move));
+		jumpMove->color = gamePosition->turn;
+		jumpMove->tile[0][0] = -1;
+		addElement(mylinkedlist,jumpMove);
+	}
+
+	
+
 	//Todo check if we need case when there is no move(I imagine not)
 
 	return mylinkedlist;
@@ -372,6 +386,8 @@ void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int
 
 	printf("Pos JUMP (%d, %d)\n", i,j);
 	int possibleJumps, playerDirection;
+
+	memset(jumpMove,0,sizeof(Move));
 
 	possibleJumps = canJump(i, j, gamePosition->turn, gamePosition);
 
@@ -470,39 +486,6 @@ int min(int a, int b)
 
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
 	
-	//check transposition table
-	// Transp* curTransp= NULL;
-	// if(((curTransp=retrieveTransposition(aPosition)) != NULL)&&(finalMove == NULL)){ //transposition found
-		
-		
-	// 	//printf("Upperdepth: %d, lowerDepth: %d, currentDepth: %d\n", curTransp->upperDepth, curTransp->lowerDepth, depth);
-	// 	if((curTransp->validity & 0x2)&&(curTransp->lowerBound >= beta)){
-	// 		if(curTransp->lowerDepth >= depth){
-	// 			hitsLower++;
-	// 			return curTransp->lowerBound;
-	// 		}
-	// 	}
-
-	// 	if((curTransp->validity & 0x2))
-	// 		if(curTransp->lowerDepth >= depth)
-	// 			alpha = max(alpha, curTransp->lowerBound);
-
-
-			
-	// 	if((curTransp->validity & 0x4)&&(curTransp->upperBound <= alpha)){
-	// 		if(curTransp->upperDepth >= depth){
-	// 			hitsUpper++;
-	// 			return curTransp->upperBound;
-	// 		}
-	// 	}
-
-
-
-
-	// 	if((curTransp->validity & 0x4))
-	// 		if(curTransp->upperDepth >= depth)
-	// 			beta = min (beta, curTransp->upperBound);
-	//}
 	
 
 	if (depth <= 0){ //if we reached the maximum depth of our recursion
@@ -513,11 +496,13 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 	}
 
 	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
+	printAvailableMoves(moveList);
+
 	Move * tempData = NULL;
 
 
 	if (moveList == NULL || moveList->head->data == NULL){     //If for any reason, no more moves are available
-		//deleteList(moveList);
+		emptyList(moveList);
 		return evaluationFunction(aPosition);
 	}
 
@@ -534,7 +519,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		a = alpha;
 		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
 
-			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
+			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
 			memcpy(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
 
@@ -555,8 +540,10 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 			a = max(a, g);
 			//alpha = max(alpha, tempScore);
 			//if( beta <= alpha){ free(tempData); break;}
-			free(tempData);
-		}/*
+			
+		}
+		//free(tempData);
+		/*
 		freeList(moveList);
 		free(tempPosition);
 		saveTransposition(aPosition, alpha, depth);
@@ -567,7 +554,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		b = beta;
 		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
 
-			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
+			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
 
 			memcpy(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
@@ -579,15 +566,17 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 			b = min(b, g);
 
 			//if( beta <= alpha){ free(tempData); break;}
-			free(tempData);
+			
 		}
+		//free(tempData);
 		/*
 		saveTransposition(aPosition, beta, depth);
 		//printf("%d\n", beta);
 		return beta;
 		*/
 	}
-
+	free(tempPosition);
+	// free(tempPosition);
 	//deleteList(moveList);
 	//free(tempPosition);
 	
