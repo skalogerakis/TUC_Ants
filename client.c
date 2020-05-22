@@ -2,15 +2,14 @@
 #include "board.h"
 #include "move.h"
 #include "comm.h"
-#include "list.h"
-// #include "transposition.h"
+// #include "list.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
-
+#include "client.h"
 #include <sys/time.h>
 
 #define MAX_DEPTH 8
@@ -39,11 +38,11 @@ char * ip = "127.0.0.1";	// default ip (local machine)
 //          --log-file=valgrind-out.txt  ./client
 
 
-int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
+//int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
 
 
-Move* findMove(Position*, int);
-int evalPosition(Position*);
+//Move* findMove(Position*, int);
+//int evalPosition(Position*);
 int main( int argc, char ** argv )
 {
 	int c;
@@ -160,7 +159,7 @@ int main( int argc, char ** argv )
 }
 
 
-void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion*/,char i, char j, Position *aPosition){
+void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion*/,int i, int j, Position *aPosition){
 	
 	int possibleJumps, playerDirection;
 	char color = move->color;
@@ -175,11 +174,11 @@ void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion
 	if(possibleJumps){
 		if(possibleJumps == 1) //can jump left
 		{
-			recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
+			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
 			return;
 		}else if(possibleJumps == 2) //can jump right
 		{
-			recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j+2, aPosition);
+			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j+2, aPosition);
 			return;
 		}else if(possibleJumps == 3) //we need to split the jumps
 		{
@@ -187,8 +186,8 @@ void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion
 			Move * newMove = malloc(sizeof(Move));
 			memcpy(newMove, move, sizeof(Move));
 			//following both left and right
-			recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
-			recursiveFollowJump(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
+			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
+			multipleJumps(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
 			return;
 
 		}
@@ -201,7 +200,7 @@ void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion
 
 
 	if(isLegal(aPosition, move)){
-		push(moveList, move);
+		addElement(moveList, move);
 		}
 	else
 		free(move);
@@ -209,11 +208,11 @@ void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion
 	
 }
 
-list* findAllMoves(Position *aPosition) {
+LinkedList* moveFinder(Position *aPosition) {
 	int i, j, jumpPossible = 0, movePossible = 0, playerDirection;
-	list* moveList = (list*)malloc(sizeof(list));
+	LinkedList* moveList = (LinkedList*)malloc(sizeof(LinkedList));
 
-	initList(moveList);
+	moveList = LinkedListInitializer(moveList);
 	Move *move;
 
 	playerDirection = aPosition->turn == WHITE ? 1 : -1; 
@@ -229,12 +228,12 @@ list* findAllMoves(Position *aPosition) {
 					//From assignment we give priority to jumps than simple moves
 					if( canJump( i, j, aPosition->turn, aPosition ) ){
 						//printf("JUMP POSSIBLE\n");
-						if(!jumpPossible) freeList(moveList); //any simple moves are deleted
+						if(!jumpPossible) deleteList(moveList); //any simple moves are deleted
 						
 						move = malloc(sizeof(Move));
 						memset(move,0,sizeof(Move));
 						move->color = aPosition->turn;
-						recursiveFollowJump(moveList, move, 0, i, j, aPosition); //FOUND! IF MORE THAN ONE JUMP POSSIBLE THEN PUSHING THE SAME MALLOC'd move
+						multipleJumps(moveList, move, 0, i, j, aPosition); //FOUND! IF MORE THAN ONE JUMP POSSIBLE THEN PUSHING THE SAME MALLOC'd move
 						jumpPossible = 1;
 					}else if((jumpPossible == 0)){ //We come in here only when we have not found yet a jump(only simple moves)
 
@@ -247,7 +246,7 @@ list* findAllMoves(Position *aPosition) {
 						move->tile[0][2] = -1;
 
 						if(isLegal(aPosition, move)){
-							push(moveList, move);}
+							addElement(moveList, move);}
 						else
 							free(move);
 
@@ -259,7 +258,7 @@ list* findAllMoves(Position *aPosition) {
 						move->tile[1][1] = j+1;
 						move->tile[0][2] = -1;
 						if(isLegal(aPosition, move)){
-							push(moveList, move);}
+							addElement(moveList, move);}
 						else
 							free(move);
 
@@ -280,7 +279,7 @@ list* findAllMoves(Position *aPosition) {
 }
 
 //TODO will change that eventually
-int evalPosition (Position *aPosition) {
+int evaluationFunction (Position *aPosition) {
     int i,j, evaluation = 0;
     
     for (i = 0; i < BOARD_ROWS; i++)
@@ -330,16 +329,16 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 	
 
 	if (depth <= 0){ //if we reached the maximum depth of our recursion and there are no captures we can see
-			return evalPosition(aPosition); //return heuristic
+			return evaluationFunction(aPosition); //return heuristic
 	}
 
-	list *moveList = findAllMoves(aPosition);   //finding all legal moves in this position
+	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
 	Move *tempData = NULL;
 
 
 	if (moveList == NULL || moveList->head == NULL){     //If for any reason, no more moves are available
-		freeList(moveList);
-		return evalPosition(aPosition);
+		deleteList(moveList);
+		return evaluationFunction(aPosition);
 	}
 
 	Position* tempPosition = malloc(sizeof(Position));
@@ -352,7 +351,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 
 		g = -INFINITY;
 		a = alpha;
-		while((g<beta)&&((tempData = pop(moveList)) != NULL)){ //for each child position
+		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
 
 
 			memcpy(tempPosition, aPosition, sizeof(Position));
@@ -382,7 +381,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 	}else{
 		g = INFINITY;
 		b = beta;
-		while((g>alpha)&&(tempData = pop(moveList)) != NULL){ //for each child position
+		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
 
 			memcpy(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
@@ -402,7 +401,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		*/
 	}
 
-	freeList(moveList);
+	deleteList(moveList);
 	free(tempPosition);
 	return g;
 }

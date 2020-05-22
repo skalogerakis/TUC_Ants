@@ -14,10 +14,6 @@ struct LinkedList
 };
 
 
-
-// struct node *head;
-// struct node *current;
-
 LinkedList* LinkedListInitializer(LinkedList *myList){
 	myList->data = NULL;
 	myList->head = NULL;
@@ -72,27 +68,10 @@ void printAvailableMoves(LinkedList *myList){
    
 }
 
-// void deleteList(LinkedList *myList){
-// 	LinkedList *ptrNext;
-
-//    	if(myList->head == NULL || myList == NULL){
-//    		//printf("List is empty\n");
-//    		return;
-//    	}
-
-//    	while(myList->head != NULL){
-// 		ptrNext = myList->head->next;
-// 		//free(myList->head);
-//    		myList->head->next = ptrNext;
-//    	}
-//    	free(myList);
-
-//    	//printf("List deleted successfully\n");
-// }
-
 
 //Another implementaion. Did not help much
   /* Function to delete the entire linked list */
+//https://www.geeksforgeeks.org/write-a-function-to-delete-a-linked-list/
 void deleteList(LinkedList *myList)  
 {  
       
@@ -112,6 +91,7 @@ while (current != NULL)
 myList->head = NULL;  
 }  
 
+//TODO GET RID OF THAT
 void emptyList(LinkedList *myList){
 	LinkedList *ptrNext;
 
@@ -137,39 +117,8 @@ void addElement(LinkedList *myList ,Move* data){
 	myList->head = newElem; 
 }
 
-// Move* removeFirst(LinkedList *myList ){
-// 	printf("Remove First Element\n");
-
-// 	//printAvailableMoves(myList);
-// 	if(myList == NULL){
-// 		printf("List empty\n");
-// 		free(myList);
-// 		return NULL;
-// 	}
-
-// 	LinkedList *initNode = myList->head;
-
-// 	Move* returnData = malloc(sizeof(Move));
-
-// 	//returnData = myList->head->data;
-// 	memcpy(returnData,myList->head->data, sizeof(Move));
-
-// 	// if(initNode == NULL){
-// 	// 	printf("List empty\n");
-// 	// 	free(initNode);
-// 	// 	return NULL;
-// 	// }
-
-// 	myList->head = myList->head->next;
-// 	free(initNode);
-
-// 	return returnData;
-// }
-
 Move* removeFirst(LinkedList *myList ){
-	//printf("Remove First Element\n");
 
-	//printAvailableMoves(myList);
 	if(myList == NULL || myList->head == NULL){
 		//printf("List empty\n");
 		return NULL;
@@ -178,18 +127,8 @@ Move* removeFirst(LinkedList *myList ){
 	Move* returnMove = malloc(sizeof(Move));
 
 	LinkedList *temp = myList->head;
-
 	memmove(returnMove,temp->data,sizeof(Move));
-
 	myList->head = myList->head->next;
-
-	//printf("INIT PLACE %d %d\n", tempMoveLeft->tile[0][0], tempMoveLeft->tile[1][0]);
-
-	//printf("Remove element starting (%d,%d) and next head (%d,%d)\n", );
-
-	// returnMove = temp->data;
-	//memmove(returnMove,temp->data,sizeof(Move));
-	//free(temp);
 
 	return returnMove;
 }
