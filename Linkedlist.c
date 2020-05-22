@@ -51,6 +51,8 @@ void printAvailableMoves(LinkedList *myList){
    	return;
    }
 
+   printf("START PRINTING AGAIN!!\n");
+
    //Print everything starting from the start
    while(ptr != NULL){
    		int i=0;
@@ -70,23 +72,45 @@ void printAvailableMoves(LinkedList *myList){
    
 }
 
-void deleteList(LinkedList *myList){
-	LinkedList *ptrNext;
+// void deleteList(LinkedList *myList){
+// 	LinkedList *ptrNext;
 
-   	if(myList->head == NULL || myList == NULL){
-   		//printf("List is empty\n");
-   		return;
-   	}
+//    	if(myList->head == NULL || myList == NULL){
+//    		//printf("List is empty\n");
+//    		return;
+//    	}
 
-   	while(myList->head != NULL){
-		ptrNext = myList->head->next;
-		//free(myList->head);
-   		myList->head = ptrNext;
-   	}
-   	free(myList);
+//    	while(myList->head != NULL){
+// 		ptrNext = myList->head->next;
+// 		//free(myList->head);
+//    		myList->head->next = ptrNext;
+//    	}
+//    	free(myList);
 
-   	//printf("List deleted successfully\n");
-}
+//    	//printf("List deleted successfully\n");
+// }
+
+
+//Another implementaion. Did not help much
+  /* Function to delete the entire linked list */
+void deleteList(LinkedList *myList)  
+{  
+      
+/* deref head_ref to get the real head */
+LinkedList* current = myList->head;  
+LinkedList* next;  
+  
+while (current != NULL)  
+{  
+    next = current->next;  
+    free(current);  
+    current = next;  
+}  
+      
+/* deref head_ref to affect the real head back  
+    in the caller. */
+myList->head = NULL;  
+}  
 
 void emptyList(LinkedList *myList){
 	LinkedList *ptrNext;
@@ -165,6 +189,7 @@ Move* removeFirst(LinkedList *myList ){
 	memmove(returnMove,temp->data,sizeof(Move));
 
 	myList->head = myList->head->next;
+
 	//printf("INIT PLACE %d %d\n", tempMoveLeft->tile[0][0], tempMoveLeft->tile[1][0]);
 
 	//printf("Remove element starting (%d,%d) and next head (%d,%d)\n", );

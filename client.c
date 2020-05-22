@@ -2,22 +2,28 @@
 #include "board.h"
 #include "move.h"
 #include "comm.h"
+#include "list.h"
+// #include "transposition.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include "client.h"
 #include <string.h>
 
-#define INFINITY 999999999
+#include <sys/time.h>
+
 #define MAX_DEPTH 5
+#define INFINITY 999999999
+
+#define MAX_TIME 7
 /**********************************************************/
 Position gamePosition;		// Position we are going to use
 
 //Move moveReceived;			// temporary move to retrieve opponent's choice
 Move myMove;				// move to save our choice and send it to the server
 
-char myColor;				// to store our color
+unsigned char myColor;				// to store our color
 int mySocket;				// our socket
 
 char * agentName = "Stefanos";		//default name.. change it! keep in mind MAX_NAME_LENGTH
@@ -25,7 +31,17 @@ char * agentName = "Stefanos";		//default name.. change it! keep in mind MAX_NAM
 char * ip = "127.0.0.1";	// default ip (local machine)
 /**********************************************************/
 
+//Execute client using valgrind to find any leaks
+// valgrind --leak-check=full \
+//          --show-leak-kinds=all \
+//          --track-origins=yes \
+//          --verbose \
+//          --log-file=valgrind-out.txt  ./client
 
+
+
+Move* findMove(Position*, int);
+int evalPosition(Position*);
 int main( int argc, char ** argv )
 {
 	int c;
@@ -61,7 +77,11 @@ int main( int argc, char ** argv )
 
 	char msg;
 
+/**********************************************************/
+// used in random
 	srand( time( NULL ) );
+	
+/**********************************************************/
 
 	while( 1 )
 	{
@@ -96,56 +116,19 @@ int main( int argc, char ** argv )
 				if( !canMove( &gamePosition, myColor ) )
 				{
 					myMove.tile[ 0 ][ 0 ] = -1;		//null move
-					printf("MAIN no available moves\n");
 				}
 				else
 				{
-					// short choice = 1;
-
-					// switch(choice){
-					// 	case 1: 
-					//printf("Cur position evaluation: %d\n", evaluationFunction(&gamePosition));
-							//myMove = initRandom(myColor,&gamePosition);
-						// 	printf("Random Choice 1\n");
-						// 	break;
-						// default: 
-						 	//myMove = initRandom(myColor);
-						// 	printf("Default choice\n");
-						// 	break;
-					// }
-					// Move *tempMove = newRandom(myColor,&gamePosition);
-					// myMove = *tempMove;
-					// free(tempMove);
-
-
-
-
-
-					int maxScore = -INFINITY;
-					//Move* myFinalMove = malloc(sizeof(Move));
-
-					Position* tempPosition = malloc(sizeof(Position));
-					memcpy(tempPosition, &gamePosition, sizeof(Position));
-
-					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
-
-					//myMove = *myFinalMove;
-
-					//free(myFinalMove);
-					//free(tempPosition);
-					printf("\t\tMAX SCORE %d\n", maxScore);
-
-					//Move *tempMove = findMove(&gamePosition, 0/*initial depth*/);
-					//myMove = *tempMove;
-					//free(tempMove);
-
+					Move *tempMove = findMove(&gamePosition, 0/*initial depth*/);
+					myMove = *tempMove;
+					free(tempMove);
 				}
 
 				sendMove( &myMove, mySocket );			//send our move
 				//printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
 				//doMove( &gamePosition, &myMove );		//play our move on our position
-				//printPosition( &gamePosition );
-				
+				printPosition( &gamePosition );
+
 				break;
 
 			case NM_QUIT:			//server wants us to quit...we shall obey
@@ -157,285 +140,141 @@ int main( int argc, char ** argv )
 		}
 
 	} 
-
 	return 0;
 }
 
 
+void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion*/,char i, char j, Position *aPosition){
+	
+	assert(MAXIMUM_MOVE_SIZE > k);
+	
+	int possibleJumps, playerDirection;
+	char color = move->color;
+	move->tile[0][k] = i;
+	move->tile[1][k] = j;
 
-Move initRandom(char myColor, Position *aPosition){
-	/**********************************************************/
-// random player - not the most efficient implementation
-	int i, j, k;
-	int jumpPossible;
-	int playerDirection;
+	if(!(possibleJumps = canJump(i, j, color, aPosition))){
+		move->tile[0][k+1] = -1;
+		//assert(isLegal(aPosition, move));
+		if(isLegal(aPosition, move)){
 
-	LinkedList *moves = moveFinder(aPosition);
+			push(moveList, move);
+			}
+		else
+			free(move);
+		return;
+	}
 
-	printAvailableMoves(moves);
-
-	removeFirst(moves);
-
-
-
-	if( myColor == WHITE )		// find movement's direction
+	if( color == WHITE )		// find movement's direction
 		playerDirection = 1;
 	else
 		playerDirection = -1;
 
-	jumpPossible = FALSE;		// determine if we have a jump available
-	for( i = 0; i < BOARD_ROWS; i++ )
+
+	if(possibleJumps == 1) //can jump left
 	{
-		for( j = 0; j < BOARD_COLUMNS; j++ )
-		{
-			if( gamePosition.board[ i ][ j ] == myColor )
-			{
-				if( canJump( i, j, myColor, &gamePosition ) )
-					jumpPossible = TRUE;
-			}
-		}
+		recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
 	}
 
-	while( 1 )
+
+	if(possibleJumps == 2) //can jump right
 	{
-		i = rand() % (BOARD_ROWS);
-		j = rand() % BOARD_COLUMNS;
-
-		if( gamePosition.board[ i ][ j ] == myColor )		//find a piece of ours
-		{
-
-			myMove.tile[ 0 ][ 0 ] = i;		//piece we are going to move
-			myMove.tile[ 1 ][ 0 ] = j;
-
-			if( jumpPossible == FALSE )
-			{
-				myMove.tile[ 0 ][ 1 ] = i + 1 * playerDirection;
-				myMove.tile[ 0 ][ 2 ] = -1;
-				if( rand() % 2 == 0 )	//with 50% chance try left and then right
-				{
-					myMove.tile[ 1 ][ 1 ] = j - 1;
-					if( isLegal( &gamePosition, &myMove ))
-						break;
-
-					myMove.tile[ 1 ][ 1 ] = j + 1;
-					if( isLegal( &gamePosition, &myMove ))
-						break;
-				}
-				else	//the other 50%...try right first and then left
-				{
-					myMove.tile[ 1 ][ 1 ] = j + 1;
-					if( isLegal( &gamePosition, &myMove ))
-						break;
-
-					myMove.tile[ 1 ][ 1 ] = j - 1;
-					if( isLegal( &gamePosition, &myMove ))
-						break;
-				}
-			}
-			else	//jump possible
-			{
-				if( canJump( i, j, myColor, &gamePosition ) )
-				{
-					k = 1;
-					while( canJump( i, j, myColor, &gamePosition ) != 0 )
-					{
-						myMove.tile[ 0 ][ k ] = i + 2 * playerDirection;
-						if( rand() % 2 == 0 )	//50% chance
-						{
-
-							if( canJump( i, j, myColor, &gamePosition ) % 2 == 1 )		//left jump possible
-								myMove.tile[ 1 ][ k ] = j - 2;
-							else
-								myMove.tile[ 1 ][ k ] = j + 2;
-
-						}
-						else	//50%
-						{
-
-							if( canJump( i, j, myColor, &gamePosition ) > 1 )		//right jump possible
-								myMove.tile[ 1 ][ k ] = j + 2;
-							else
-								myMove.tile[ 1 ][ k ] = j - 2;
-
-						}
-
-						if( k + 1 == MAXIMUM_MOVE_SIZE )	//maximum tiles reached
-							break;
-
-						myMove.tile[ 0 ][ k + 1 ] = -1;		//maximum tiles not reached
-
-						i = myMove.tile[ 0 ][ k ];		//we will try to jump from this point in the next loop
-						j = myMove.tile[ 1 ][ k ];
-
-
-						k++;
-					}
-					break;
-				}
-			}
-		}
-
+		recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j+2, aPosition);
 	}
 
-	return myMove;
-// end of random
-/**********************************************************/
+	if(possibleJumps == 3) //we need to split the jumps
+	{
+		//copying move:
+		Move * newMove = malloc(sizeof(Move));
+		memcpy(newMove, move, sizeof(Move));
+		//following both left and right
+		recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
+		recursiveFollowJump(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
+
+	}
+	return;
 }
+list* findAllMoves(Position *aPosition) {
+	int i, j, jumpPossible = FALSE, movePossible = FALSE, playerDirection;
+	list* moveList = malloc(sizeof(list));
 
+	initList(moveList);
+	Move *move;
 
-LinkedList* moveFinder(Position *gamePosition){
+	char curColor = aPosition->turn;
 
-	int i, j, moveDirection, canJumpOver = 0;
-
-	LinkedList *mylinkedlist = (LinkedList*)malloc(sizeof(LinkedList));
-
-	mylinkedlist = LinkedListInitializer(mylinkedlist);
-
-	//Move *tempMoveLeft = NULL, *tempMoveRight = NULL, *jumpMove = NULL;	
-
-	//Start iterating through the board to track all available moves
-	for( i = 0; i < BOARD_ROWS; i++ )
-	{
-		for( j = 0; j < BOARD_COLUMNS; j++ )
-		{
-			if(gamePosition->board[i][j] != gamePosition->turn) continue;
-
-			
-
-			if( canJump( i, j, gamePosition->turn, gamePosition ) ){
-				//printf("JUMP POSSIBLE\n");
-
-				Move *jumpMove = (Move *)malloc(sizeof(Move));
-				//jumpMove =NULL;
-				memset(jumpMove,0,sizeof(Move));
-				jumpMove->color = gamePosition->turn;
-				//jumpMove->tile[0][0]
-
-				if(!canJumpOver) emptyList(mylinkedlist); //Assignment mentions that jump move have priority over simple. So we don't need simple in that case
-
-				multipleJumps(mylinkedlist, jumpMove, gamePosition, i, j, 0); 
-				canJumpOver = 1;
-				//continue;
-			}
-	
-
-			if(!canJumpOver){	
-				
-				/*
-				We create space for right and left moves otherwise it overwites.Remember here we simply
-				want to track all the available moves in each position
-				*/
-				Move *tempMoveLeft = (Move *)malloc(sizeof(Move));
-
-				
-				tempMoveLeft->color = gamePosition->turn;
-				tempMoveLeft->tile[0][0] = i;		//piece we are going to move
-				tempMoveLeft->tile[1][0] = j;
-				tempMoveLeft->tile[0][1] = i + 1 * (gamePosition->turn == WHITE ? 1 : -1);
-				tempMoveLeft->tile[0][2] = -1;
-				tempMoveLeft->tile[1][1] = j - 1;
-
-				//printf("INIT PLACE %d %d\n", tempMoveLeft->tile[0][0], tempMoveLeft->tile[1][0]);
-
-				if(isLegal(gamePosition, tempMoveLeft)){
-					//printf("NEW MOVE %d %d\n", tempMoveLeft->tile[0][1], tempMoveLeft->tile[1][1]);
-					addElement(mylinkedlist, tempMoveLeft);}
-				else
-					free(tempMoveLeft);
-
-				Move* tempMoveRight = (Move *)malloc(sizeof(Move));
-
-				tempMoveRight->color = gamePosition->turn;
-				tempMoveRight->tile[0][0] = i;		//piece we are going to move
-				tempMoveRight->tile[1][0] = j;
-				tempMoveRight->tile[0][1] = i + 1 * (gamePosition->turn == WHITE ? 1 : -1);
-				tempMoveRight->tile[0][2] = -1;
-				tempMoveRight->tile[1][1] = j + 1;
-
-				if(isLegal(gamePosition, tempMoveRight)){
-					//printf("NEW MOVE %d %d\n", tempMoveRight->tile[0][1], tempMoveRight->tile[1][1]);
-					addElement(mylinkedlist, tempMoveRight);}
-				else
-					free(tempMoveRight);
-
-				
-			}
-
-		}
-
-	}
-
-	if(mylinkedlist == NULL){
-		Move* jumpMove = malloc(sizeof(Move));
-		jumpMove->color = gamePosition->turn;
-		jumpMove->tile[0][0] = -1;
-		addElement(mylinkedlist,jumpMove);
-	}
-
-	
-
-	//Todo check if we need case when there is no move(I imagine not)
-
-	return mylinkedlist;
-}
-
-
-void multipleJumps(LinkedList* mylist, Move* jumpMove,Position *gamePosition,int i, int j,int k ){
-	
-	//assert(MAXIMUM_MOVE_SIZE > k);
-
-	printf("Pos JUMP (%d, %d)\n", i,j);
-	int possibleJumps, playerDirection;
-
-	memset(jumpMove,0,sizeof(Move));
-
-	possibleJumps = canJump(i, j, gamePosition->turn, gamePosition);
-
-	if(possibleJumps){
-
-		jumpMove->tile[0][k] = i;
-		jumpMove->tile[1][k] = j;
-
-		playerDirection = gamePosition->turn == WHITE ? 1 : -1;
-
-
-		if(possibleJumps == 1) //can jump left
-		{
-			multipleJumps(mylist, jumpMove, gamePosition, i + 2*playerDirection, j-2, k+1);
-			return;
-		}else if(possibleJumps == 2){
-			multipleJumps(mylist, jumpMove,  gamePosition, i + 2*playerDirection, j+2, k+1);
-			return;
-		}else{
-			//IMPORTANT: DONT ASSIGN RIGHT AWAY POINTERS, CAUSES SEGMENTATION FAULT. Use memmove instead
-			Move * altJumpMove = (Move *)malloc(sizeof(Move)); //create a duplicate move to follow the two different paths
-			//altJumpMove = jumpMove;
-			memmove(altJumpMove, jumpMove, sizeof(Move));
-
-			multipleJumps(mylist, altJumpMove, gamePosition , i + 2 * playerDirection, j+2, k+1);
-			multipleJumps(mylist, jumpMove, gamePosition, i + 2 * playerDirection, j-2, k+1);
-			
-			return;
-		}
-
-	}
-
-
-	//To reach here no other jumps must be available. Check if the move is legit and add it to our list or free otherwise
-	if( k + 1 != MAXIMUM_MOVE_SIZE ){
-		jumpMove->tile[0][k+1] = -1;
-	}
-	
-
-	if(isLegal(gamePosition, jumpMove))
-		addElement(mylist, jumpMove);
+	if( curColor == WHITE )		// find movement's direction
+		playerDirection = 1;
 	else
-		free(jumpMove);
+		playerDirection = -1;
 
+
+
+
+
+	//jump not possible, finding all normal moves
+	for( i = 0; i < BOARD_ROWS; i++ )
+	{
+		for( j = 0; j < BOARD_COLUMNS; j++)
+			{
+				if( aPosition->board[ i ][ j ] == curColor )
+				{
+					if( canJump( i, j, curColor, aPosition ) ){
+						if(!jumpPossible)
+							emptyList(moveList); //any simple moves are deleted
+						move = malloc(sizeof(Move));
+						move->color = curColor;
+						recursiveFollowJump(moveList, move, 0, i, j, aPosition); //FOUND! IF MORE THAN ONE JUMP POSSIBLE THEN PUSHING THE SAME MALLOC'd move
+						jumpPossible = TRUE;
+					}
+					if((jumpPossible == FALSE))
+					{
+						// if(movePossible % 2 == 1) //left move possible
+						// {	
+							move = malloc(sizeof(Move));
+							move->color = aPosition->turn;
+							move->tile[0][0] = i;
+							move->tile[1][0] = j;
+							move->tile[0][1] = i + playerDirection;
+							move->tile[1][1] = j-1;
+							move->tile[0][2] = -1;
+							if(isLegal(aPosition, move)){
+								push(moveList, move);}
+							else
+								free(move);
+						// }
+						// if(movePossible > 1){
+							move = malloc(sizeof(Move));
+							move->color = aPosition->turn;
+							move->tile[0][0] = i;
+							move->tile[1][0] = j;
+							move->tile[0][1] = i + playerDirection;
+							move->tile[1][1] = j+1;
+							move->tile[0][2] = -1;
+							if(isLegal(aPosition, move)){
+								push(moveList, move);}
+							else
+								free(move);
+						// }
+
+					}
+
+				}
+			}
+	}
+
+	if(top(moveList)==NULL){ //if we can't move
+		move = malloc(sizeof(Move));
+		move->color = curColor;
+		move->tile[0][0] = -1;
+		push(moveList, move);
+		return moveList;
+	}
+	return moveList;
+						
 }
 
-
-int evaluationFunction (Position *aPosition) {
+int evalPosition (Position *aPosition) {
     int i,j, evaluation = 0;
     
     for (i = 0; i < BOARD_ROWS; i++)
@@ -467,9 +306,6 @@ int evaluationFunction (Position *aPosition) {
 
     return evaluation;
 }
-
-
-
 int max(int a, int b)
 {
 	if (a > b)
@@ -484,26 +320,44 @@ int min(int a, int b)
 }
 
 
+int quiescenceSearch(Position* aPosition){
+		int i, j;
+		//quiescence search
+		// determine if we have a jump available
+		for( i = 0; i < BOARD_ROWS; i++ )
+		{
+			for( j = 0; j < BOARD_COLUMNS; j++ )
+			{
+				if( aPosition->board[ i ][ j ] == aPosition->turn )
+				{
+					if( canJump( i, j, aPosition->turn, aPosition ) ){
+						return TRUE;
+						}
+				}
+			}
+		}
+		return FALSE;
+
+
+}
+
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
-	
 	
 
 	if (depth <= 0){ //if we reached the maximum depth of our recursion
 		//if(!quiescenceSearch(aPosition)){ // and there are no captures we can see
-			return evaluationFunction(aPosition); //return heuristic
+			return evalPosition(aPosition); //return heuristic
 		//}
 		
 	}
 
-	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
-	printAvailableMoves(moveList);
-
+	list *moveList = findAllMoves(aPosition);   //finding all legal moves in this position
 	Move * tempData = NULL;
 
 
-	if (moveList == NULL || moveList->head->data == NULL){     //If for any reason, no more moves are available
-		emptyList(moveList);
-		return evaluationFunction(aPosition);
+	if (top(moveList) == NULL){     //If for any reason, no more moves are available
+		freeList(moveList);
+		return evalPosition(aPosition);
 	}
 
 	Position* tempPosition = malloc(sizeof(Position));
@@ -517,13 +371,11 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 
 		g = -INFINITY;
 		a = alpha;
-		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
+		while((g<beta)&&((tempData = pop(moveList)) != NULL)){ //for each child position
 
-			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
+
 			memcpy(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
-
-			//printf("MAXIMIZER Searching Move on depth %d:\n", depth);
 
 			tempScore = alpha_beta(tempPosition, depth-1, a, beta, 0, NULL);
 
@@ -533,32 +385,29 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 			if(g < tempScore){
 				g = tempScore;
 				if(finalMove != NULL){
-					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
+					//printf("%d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
 					memcpy(finalMove, tempData, sizeof(Move));
 				}
 			}
 			a = max(a, g);
 			//alpha = max(alpha, tempScore);
 			//if( beta <= alpha){ free(tempData); break;}
-			
-		}
-		//free(tempData);
-		/*
+			free(tempData);
+		}/*
 		freeList(moveList);
 		free(tempPosition);
 		saveTransposition(aPosition, alpha, depth);
 		//printf("alpha: %d\n", alpha);
+
 		return alpha;*/
 	}else{
 		g = INFINITY;
 		b = beta;
-		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
-
-			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[1][0], tempData->tile[1][1]);
+		while((g>alpha)&&(tempData = pop(moveList)) != NULL){ //for each child position
 
 			memcpy(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
-			//printf("MINIMIZER Searching Move on depth %d:\n", depth);
+			//printf("Searching Move on depth %d:\n", depth);
 			//printMove(tempData);
 			tempScore = alpha_beta(tempPosition, depth-1, alpha, b, 1, NULL);
 			
@@ -566,27 +415,45 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 			b = min(b, g);
 
 			//if( beta <= alpha){ free(tempData); break;}
-			
+			free(tempData);
 		}
-		//free(tempData);
 		/*
+
 		saveTransposition(aPosition, beta, depth);
 		//printf("%d\n", beta);
 		return beta;
 		*/
 	}
+
+	freeList(moveList);
 	free(tempPosition);
-	// free(tempPosition);
-	//deleteList(moveList);
-	//free(tempPosition);
 	
-	// if(g <= alpha)
-	// 	saveUpperTransposition(aPosition, g, depth);
-	// if(g > alpha && g < beta)
-	// 	saveTransposition(aPosition, g, g, depth);
-	// if (g>= beta)
-	// 	saveLowerTransposition(aPosition, g, depth);
+	
 	
 
 	return g;
 }
+
+
+
+Move* findMove(Position* aPosition, int depth){
+
+	
+	Move* myFinalMove = malloc(sizeof(Move));
+
+	Position* tempPosition = malloc(sizeof(Position));
+	memcpy(tempPosition, aPosition, sizeof(Position));
+
+	int maxScore = -INFINITY;
+	printf("Cur position evaluation: %d\n", evalPosition(aPosition));
+	maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, myFinalMove);
+	//maxScore = MTFD(tempPosition, evalPosition(aPosition), MAX_DEPTH, myFinalMove);
+	//iterativeDeepening(tempPosition, myFinalMove);
+	
+	//freeList(moveList);
+	free(tempPosition);
+	//printList(moveList);
+	
+	return myFinalMove;
+}
+
