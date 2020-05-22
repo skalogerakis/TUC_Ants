@@ -13,7 +13,7 @@
 
 #include <sys/time.h>
 
-#define MAX_DEPTH 5
+#define MAX_DEPTH 8
 #define INFINITY 999999999
 
 #define MAX_TIME 7
@@ -146,14 +146,61 @@ int main( int argc, char ** argv )
 
 void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion*/,char i, char j, Position *aPosition){
 	
-	assert(MAXIMUM_MOVE_SIZE > k);
-	
+	//assert(MAXIMUM_MOVE_SIZE > k);
+	//printf("Pos JUMP (%d, %d)\n", i,j);
+
 	int possibleJumps, playerDirection;
 	char color = move->color;
 	move->tile[0][k] = i;
 	move->tile[1][k] = j;
 
-	if(!(possibleJumps = canJump(i, j, color, aPosition))){
+	// if(!(possibleJumps = canJump(i, j, color, aPosition))){
+	// 	move->tile[0][k+1] = -1;
+	// 	//assert(isLegal(aPosition, move));
+	// 	if(isLegal(aPosition, move)){
+
+	// 		push(moveList, move);
+	// 		}
+	// 	else
+	// 		free(move);
+	// 	return;
+	// }
+
+	// if( color == WHITE )		// find movement's direction
+	// 	playerDirection = 1;
+	// else
+	// 	playerDirection = -1;
+	possibleJumps = canJump(i, j, color, aPosition);
+
+
+	playerDirection = aPosition->turn == WHITE ? 1 : -1;
+
+	if(possibleJumps){
+		if(possibleJumps == 1) //can jump left
+		{
+			recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
+			return;
+		}else if(possibleJumps == 2) //can jump right
+		{
+			recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j+2, aPosition);
+			return;
+		}else if(possibleJumps == 3) //we need to split the jumps
+		{
+			//copying move:
+			Move * newMove = malloc(sizeof(Move));
+			memcpy(newMove, move, sizeof(Move));
+			//following both left and right
+			recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
+			recursiveFollowJump(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
+			return;
+
+		}
+	}
+
+	
+
+
+	//if(!(possibleJumps = canJump(i, j, color, aPosition))){
 		move->tile[0][k+1] = -1;
 		//assert(isLegal(aPosition, move));
 		if(isLegal(aPosition, move)){
@@ -163,113 +210,75 @@ void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion
 		else
 			free(move);
 		return;
-	}
+	//}
 
-	if( color == WHITE )		// find movement's direction
-		playerDirection = 1;
-	else
-		playerDirection = -1;
-
-
-	if(possibleJumps == 1) //can jump left
-	{
-		recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
-	}
-
-
-	if(possibleJumps == 2) //can jump right
-	{
-		recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j+2, aPosition);
-	}
-
-	if(possibleJumps == 3) //we need to split the jumps
-	{
-		//copying move:
-		Move * newMove = malloc(sizeof(Move));
-		memcpy(newMove, move, sizeof(Move));
-		//following both left and right
-		recursiveFollowJump(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
-		recursiveFollowJump(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
-
-	}
 	return;
 }
 list* findAllMoves(Position *aPosition) {
-	int i, j, jumpPossible = FALSE, movePossible = FALSE, playerDirection;
-	list* moveList = malloc(sizeof(list));
+	int i, j, jumpPossible = 0, movePossible = 0, playerDirection;
+	list* moveList = (list*)malloc(sizeof(list));
 
 	initList(moveList);
 	Move *move;
 
-	char curColor = aPosition->turn;
-
-	if( curColor == WHITE )		// find movement's direction
-		playerDirection = 1;
-	else
-		playerDirection = -1;
+	playerDirection = aPosition->turn == WHITE ? 1 : -1; 
 
 
-
-
-
-	//jump not possible, finding all normal moves
+	//Start iterating through the board to track all available moves
 	for( i = 0; i < BOARD_ROWS; i++ )
 	{
 		for( j = 0; j < BOARD_COLUMNS; j++)
 			{
-				if( aPosition->board[ i ][ j ] == curColor )
-				{
-					if( canJump( i, j, curColor, aPosition ) ){
-						if(!jumpPossible)
-							emptyList(moveList); //any simple moves are deleted
+				if( aPosition->board[ i ][ j ] != aPosition->turn ) continue;
+					
+					//From assignment we give priority to jumps than simple moves
+					if( canJump( i, j, aPosition->turn, aPosition ) ){
+						//printf("JUMP POSSIBLE\n");
+						if(!jumpPossible) emptyList(moveList); //any simple moves are deleted
 						move = malloc(sizeof(Move));
-						move->color = curColor;
+						memset(move,0,sizeof(Move));
+						move->color = aPosition->turn;
 						recursiveFollowJump(moveList, move, 0, i, j, aPosition); //FOUND! IF MORE THAN ONE JUMP POSSIBLE THEN PUSHING THE SAME MALLOC'd move
-						jumpPossible = TRUE;
-					}
-					if((jumpPossible == FALSE))
-					{
-						// if(movePossible % 2 == 1) //left move possible
-						// {	
-							move = malloc(sizeof(Move));
-							move->color = aPosition->turn;
-							move->tile[0][0] = i;
-							move->tile[1][0] = j;
-							move->tile[0][1] = i + playerDirection;
-							move->tile[1][1] = j-1;
-							move->tile[0][2] = -1;
-							if(isLegal(aPosition, move)){
-								push(moveList, move);}
-							else
-								free(move);
-						// }
-						// if(movePossible > 1){
-							move = malloc(sizeof(Move));
-							move->color = aPosition->turn;
-							move->tile[0][0] = i;
-							move->tile[1][0] = j;
-							move->tile[0][1] = i + playerDirection;
-							move->tile[1][1] = j+1;
-							move->tile[0][2] = -1;
-							if(isLegal(aPosition, move)){
-								push(moveList, move);}
-							else
-								free(move);
-						// }
+						jumpPossible = 1;
+					}else if((jumpPossible == 0)){ //We come in here only when we have not found yet a jump(only simple moves)
+
+						move = (Move*)malloc(sizeof(Move));
+						move->color = aPosition->turn;
+						move->tile[0][0] = i;
+						move->tile[1][0] = j;
+						move->tile[0][1] = i + playerDirection;
+						move->tile[1][1] = j-1;
+						move->tile[0][2] = -1;
+
+						if(isLegal(aPosition, move)){
+							push(moveList, move);}
+						else
+							free(move);
+
+						move = (Move*) malloc(sizeof(Move));
+						move->color = aPosition->turn;
+						move->tile[0][0] = i;
+						move->tile[1][0] = j;
+						move->tile[0][1] = i + playerDirection;
+						move->tile[1][1] = j+1;
+						move->tile[0][2] = -1;
+						if(isLegal(aPosition, move)){
+							push(moveList, move);}
+						else
+							free(move);
 
 					}
-
-				}
+				
 			}
 	}
 
-	if(top(moveList)==NULL){ //if we can't move
-		move = malloc(sizeof(Move));
-		move->color = curColor;
-		move->tile[0][0] = -1;
-		push(moveList, move);
-		return moveList;
-	}
+	// if(moveList==NULL){ //if we can't move
+	// 	move = malloc(sizeof(Move));
+	// 	move->color = aPosition->turn;
+	// 	move->tile[0][0] = -1;
+	// 	push(moveList, move);
+	// 	return moveList;
+	// }
 	return moveList;
 						
 }
@@ -320,26 +329,26 @@ int min(int a, int b)
 }
 
 
-int quiescenceSearch(Position* aPosition){
-		int i, j;
-		//quiescence search
-		// determine if we have a jump available
-		for( i = 0; i < BOARD_ROWS; i++ )
-		{
-			for( j = 0; j < BOARD_COLUMNS; j++ )
-			{
-				if( aPosition->board[ i ][ j ] == aPosition->turn )
-				{
-					if( canJump( i, j, aPosition->turn, aPosition ) ){
-						return TRUE;
-						}
-				}
-			}
-		}
-		return FALSE;
+// int quiescenceSearch(Position* aPosition){
+// 		int i, j;
+// 		//quiescence search
+// 		// determine if we have a jump available
+// 		for( i = 0; i < BOARD_ROWS; i++ )
+// 		{
+// 			for( j = 0; j < BOARD_COLUMNS; j++ )
+// 			{
+// 				if( aPosition->board[ i ][ j ] == aPosition->turn )
+// 				{
+// 					if( canJump( i, j, aPosition->turn, aPosition ) ){
+// 						return TRUE;
+// 						}
+// 				}
+// 			}
+// 		}
+// 		return FALSE;
 
 
-}
+// }
 
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
 	
@@ -352,7 +361,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 	}
 
 	list *moveList = findAllMoves(aPosition);   //finding all legal moves in this position
-	Move * tempData = NULL;
+	Move *tempData = NULL;
 
 
 	if (top(moveList) == NULL){     //If for any reason, no more moves are available
@@ -427,10 +436,6 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 
 	freeList(moveList);
 	free(tempPosition);
-	
-	
-	
-
 	return g;
 }
 

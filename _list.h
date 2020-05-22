@@ -4,15 +4,17 @@
 /* ^^ these are the include guards */
 
 /* Prototypes for the functions */
-
-
+/* Sums two ints */
 typedef struct node{
 	Move* data;
 	struct node *next;
-	struct node *head;
+} node;
+
+
+typedef struct {
+	node *start;
+	node *tail;
 } list;
-
-
 
 
 void initList(list *sList);

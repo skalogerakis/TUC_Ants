@@ -2,80 +2,108 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 void initList(list *sList){
-	sList->start= NULL;
-	sList->tail= NULL;
+	sList->head= NULL;
+	sList->next= NULL;
+	sList->data = NULL;
 }
 
 void push(list *sList, Move* data)
 {
-	node *p;
-	p = malloc(sizeof(node));
+	list *p = (list*)malloc(sizeof(list));
 	p->data = data;
-	p->next = sList->start;
-	if(sList->start == NULL);
-		sList->tail = p;
-	sList->start = p;
+	p->next = sList->head;
+	sList->head = p;
 }
 
-Move* top(list *sList){
-	//assert(sList->start != NULL);
-	if(sList == NULL || sList->start == NULL)
-		return NULL;
-	return sList->start->data;
-}
 
+//DONE
 Move* pop(list *sList)
 {
-	if(sList == NULL || sList->start == NULL)
+	if(sList == NULL || sList->head == NULL){
+		//printf("Empty List.\n");
 		return NULL;
-	Move *myData;
-	
-	node *p = sList->start;
-	sList->start = sList->start->next;
-	if(sList->start == NULL)
-		sList->tail = NULL;
-	myData = p->data;
-	free(p);
+	}
+
+	Move* myData = malloc(sizeof(Move));
+
+	list *temp = sList->head;
+
+	memmove(myData,temp->data,sizeof(Move));
+
+	sList->head = sList->head->next;
+
+	free(temp);
 	
 	return myData;
 }
 
-list * merge(list* A, list* B){
-	assert (!(A==NULL && B==NULL));
-	if (A == NULL || A->start == NULL)
-		return B;
-	if (B == NULL || B->start == NULL)																																																																																																																																																													
-		return A;
-	A->tail->next = B->start;
-	A->tail = B->tail;
-	return A;
-}
-
+//DONE
 void freeList(list * sList){
-	while(sList->start != NULL)
+	while(sList->head != NULL)
 		free(pop(sList));
 	free(sList);
 }
+
 void emptyList(list * sList){
-	while(sList->start != NULL)
+	while(sList->head != NULL)
 		free(pop(sList));
 }
 
-void printMove(Move *aMove){
-	int i;
-	for (i = 0; i < MAXIMUM_MOVE_SIZE; i++){
-		if(aMove->tile[0][i] == -1)
-			break;
-		printf("%d %d\n", aMove->tile[0][i], aMove->tile[1][i]);
-	}
-	printf("--\n");
+void printMove(list* myList){
+	list *ptr = myList->head;
+
+   if(ptr == NULL || myList == NULL){
+   	//printf("List is empty\n");
+   	return;
+   }
+
+   printf("START PRINTING AGAIN!!\n");
+
+   //Print everything starting from the start
+   while(ptr != NULL){
+   		int i=0;
+		while(ptr->data->tile[0][i] != -1){
+			if(i==0){
+				printf("\nInit Element pos (%d,%d)\n", ptr->data->tile[0][i], ptr->data->tile[1][i]);
+			}else{
+				printf("\tNext Element pos (%d,%d)\n", ptr->data->tile[0][1], ptr->data->tile[1][1]);
+
+			}
+			
+			i++;
+		}
+
+   		ptr = ptr->next;
+   }
 }
-void printList(list * sList){
-	node* aNode = sList->start;
-	while(aNode != NULL){
-		printMove(aNode->data);
-		aNode = aNode->next;
-	}
+
+//LEGACY: This will not work to print Move struct
+void printList(list *myList){
+   list *ptr = myList->head;
+
+   if(ptr == NULL){
+   	//printf("List is empty\n");
+   	return;
+   }
+
+   //Print everything starting from the start
+   while(ptr != NULL){
+		printf("Element (%d)\n", ptr->data->tile[0][0]);
+   		ptr = ptr->next;
+   }
+   
+}
+
+
+
+
+//TODO REMOVE
+Move* top(list *sList){
+	//assert(sList->start != NULL);
+	if(sList == NULL || sList->head == NULL)
+		return NULL;
+	return sList->head->data;
 }
