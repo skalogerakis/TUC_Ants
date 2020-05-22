@@ -41,16 +41,35 @@ Move* pop(list *sList)
 }
 
 //DONE
-void freeList(list * sList){
-	while(sList->head != NULL)
-		free(pop(sList));
-	free(sList);
-}
+// void freeList(list * sList){
+// 	while(sList->head != NULL)
+// 		free(pop(sList));
+// 	free(sList);
+// }
 
-void emptyList(list * sList){
-	while(sList->head != NULL)
-		free(pop(sList));
-}
+void freeList(list *myList)  
+{  
+      
+/* deref head_ref to get the real head */
+list* current = myList->head;  
+list* next;  
+  
+while (current != NULL)  
+{  
+    next = current->next;  
+    free(current);  
+    current = next;  
+}  
+      
+/* deref head_ref to affect the real head back  
+    in the caller. */
+myList->head = NULL;  
+}  
+
+// void emptyList(list * sList){
+// 	while(sList->head != NULL)
+// 		free(pop(sList));
+// }
 
 void printMove(list* myList){
 	list *ptr = myList->head;
@@ -101,9 +120,9 @@ void printList(list *myList){
 
 
 //TODO REMOVE
-Move* top(list *sList){
-	//assert(sList->start != NULL);
-	if(sList == NULL || sList->head == NULL)
-		return NULL;
-	return sList->head->data;
-}
+// Move* top(list *sList){
+// 	//assert(sList->start != NULL);
+// 	if(sList == NULL || sList->head == NULL)
+// 		return NULL;
+// 	return sList->head->data;
+// }

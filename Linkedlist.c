@@ -132,16 +132,9 @@ void emptyList(LinkedList *myList){
 
 void addElement(LinkedList *myList ,Move* data){
 	LinkedList *newElem = (LinkedList*)malloc(sizeof(LinkedList));
-
 	newElem->data = data;
-
-	// if(myList == NULL){
-
-	// }
-
 	newElem->next = myList->head;
 	myList->head = newElem; 
-	//free(newElem);
 }
 
 // Move* removeFirst(LinkedList *myList ){

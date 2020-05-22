@@ -39,6 +39,8 @@ char * ip = "127.0.0.1";	// default ip (local machine)
 //          --log-file=valgrind-out.txt  ./client
 
 
+int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
+
 
 Move* findMove(Position*, int);
 int evalPosition(Position*);
@@ -119,14 +121,28 @@ int main( int argc, char ** argv )
 				}
 				else
 				{
-					Move *tempMove = findMove(&gamePosition, 0/*initial depth*/);
-					myMove = *tempMove;
-					free(tempMove);
-				}
 
+
+					int maxScore = -INFINITY;
+
+					Position* tempPosition = malloc(sizeof(Position));
+					memcpy(tempPosition, &gamePosition, sizeof(Position));
+
+					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
+
+					printf("\t\tMAX SCORE %d\n", maxScore);
+
+					free(tempPosition);
+
+					//THIS ALSO WORKS
+					//maxScore = alpha_beta(&gamePosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
+
+
+
+				}
+				//AFTER THE UPDATED VERSION OF ASSIGNMENT CHANGED THOSE
 				sendMove( &myMove, mySocket );			//send our move
-				//printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
-				//doMove( &gamePosition, &myMove );		//play our move on our position
+				// printf("i chose to go from (%d,%d), to (%d,%d)\n",myMove.tile[0][0],myMove.tile[1][0],myMove.tile[0][1],myMove.tile[1][1]);
 				printPosition( &gamePosition );
 
 				break;
@@ -146,30 +162,11 @@ int main( int argc, char ** argv )
 
 void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion*/,char i, char j, Position *aPosition){
 	
-	//assert(MAXIMUM_MOVE_SIZE > k);
-	//printf("Pos JUMP (%d, %d)\n", i,j);
-
 	int possibleJumps, playerDirection;
 	char color = move->color;
 	move->tile[0][k] = i;
 	move->tile[1][k] = j;
 
-	// if(!(possibleJumps = canJump(i, j, color, aPosition))){
-	// 	move->tile[0][k+1] = -1;
-	// 	//assert(isLegal(aPosition, move));
-	// 	if(isLegal(aPosition, move)){
-
-	// 		push(moveList, move);
-	// 		}
-	// 	else
-	// 		free(move);
-	// 	return;
-	// }
-
-	// if( color == WHITE )		// find movement's direction
-	// 	playerDirection = 1;
-	// else
-	// 	playerDirection = -1;
 	possibleJumps = canJump(i, j, color, aPosition);
 
 
@@ -197,23 +194,21 @@ void recursiveFollowJump(list* moveList, Move* move, int k /* depth of recursion
 		}
 	}
 
-	
 
-
-	//if(!(possibleJumps = canJump(i, j, color, aPosition))){
+	if( k + 1 != MAXIMUM_MOVE_SIZE ){
 		move->tile[0][k+1] = -1;
-		//assert(isLegal(aPosition, move));
-		if(isLegal(aPosition, move)){
+	}
 
-			push(moveList, move);
-			}
-		else
-			free(move);
-		return;
-	//}
 
+	if(isLegal(aPosition, move)){
+		push(moveList, move);
+		}
+	else
+		free(move);
 	return;
+	
 }
+
 list* findAllMoves(Position *aPosition) {
 	int i, j, jumpPossible = 0, movePossible = 0, playerDirection;
 	list* moveList = (list*)malloc(sizeof(list));
@@ -234,7 +229,8 @@ list* findAllMoves(Position *aPosition) {
 					//From assignment we give priority to jumps than simple moves
 					if( canJump( i, j, aPosition->turn, aPosition ) ){
 						//printf("JUMP POSSIBLE\n");
-						if(!jumpPossible) emptyList(moveList); //any simple moves are deleted
+						if(!jumpPossible) freeList(moveList); //any simple moves are deleted
+						
 						move = malloc(sizeof(Move));
 						memset(move,0,sizeof(Move));
 						move->color = aPosition->turn;
@@ -283,6 +279,7 @@ list* findAllMoves(Position *aPosition) {
 						
 }
 
+//TODO will change that eventually
 int evalPosition (Position *aPosition) {
     int i,j, evaluation = 0;
     
@@ -329,48 +326,23 @@ int min(int a, int b)
 }
 
 
-// int quiescenceSearch(Position* aPosition){
-// 		int i, j;
-// 		//quiescence search
-// 		// determine if we have a jump available
-// 		for( i = 0; i < BOARD_ROWS; i++ )
-// 		{
-// 			for( j = 0; j < BOARD_COLUMNS; j++ )
-// 			{
-// 				if( aPosition->board[ i ][ j ] == aPosition->turn )
-// 				{
-// 					if( canJump( i, j, aPosition->turn, aPosition ) ){
-// 						return TRUE;
-// 						}
-// 				}
-// 			}
-// 		}
-// 		return FALSE;
-
-
-// }
-
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
 	
 
-	if (depth <= 0){ //if we reached the maximum depth of our recursion
-		//if(!quiescenceSearch(aPosition)){ // and there are no captures we can see
+	if (depth <= 0){ //if we reached the maximum depth of our recursion and there are no captures we can see
 			return evalPosition(aPosition); //return heuristic
-		//}
-		
 	}
 
 	list *moveList = findAllMoves(aPosition);   //finding all legal moves in this position
 	Move *tempData = NULL;
 
 
-	if (top(moveList) == NULL){     //If for any reason, no more moves are available
+	if (moveList == NULL || moveList->head == NULL){     //If for any reason, no more moves are available
 		freeList(moveList);
 		return evalPosition(aPosition);
 	}
 
 	Position* tempPosition = malloc(sizeof(Position));
-	//Move *tempMove = malloc(sizeof(Move));
 	int tempScore, g;
 
 	int a, b;
@@ -405,8 +377,6 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		}/*
 		freeList(moveList);
 		free(tempPosition);
-		saveTransposition(aPosition, alpha, depth);
-		//printf("alpha: %d\n", alpha);
 
 		return alpha;*/
 	}else{
@@ -428,8 +398,6 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		}
 		/*
 
-		saveTransposition(aPosition, beta, depth);
-		//printf("%d\n", beta);
 		return beta;
 		*/
 	}
@@ -438,27 +406,3 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 	free(tempPosition);
 	return g;
 }
-
-
-
-Move* findMove(Position* aPosition, int depth){
-
-	
-	Move* myFinalMove = malloc(sizeof(Move));
-
-	Position* tempPosition = malloc(sizeof(Position));
-	memcpy(tempPosition, aPosition, sizeof(Position));
-
-	int maxScore = -INFINITY;
-	printf("Cur position evaluation: %d\n", evalPosition(aPosition));
-	maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, myFinalMove);
-	//maxScore = MTFD(tempPosition, evalPosition(aPosition), MAX_DEPTH, myFinalMove);
-	//iterativeDeepening(tempPosition, myFinalMove);
-	
-	//freeList(moveList);
-	free(tempPosition);
-	//printList(moveList);
-	
-	return myFinalMove;
-}
-
