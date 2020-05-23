@@ -12,7 +12,7 @@
 #include "client.h"
 #include <sys/time.h>
 
-#define MAX_DEPTH 6
+#define MAX_DEPTH 2
 #define INFINITY 999999999
 
 // #define MAX_TIME 7
@@ -123,9 +123,9 @@ int main( int argc, char ** argv )
 					memcpy(tempPosition, &gamePosition, sizeof(Position));
 
 					// int minimax(Position *gamePosition, int depth, int ismaximizingPlayer, Move* finalMove){
-					maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove);
+					//maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
-					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
+					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
 
@@ -351,7 +351,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		g = -INFINITY;
 		a = alpha;
 		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
-			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
 
 			memcpy(tempPosition, aPosition, sizeof(Position));
@@ -366,6 +366,8 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 				g = tempScore;
 				if(finalMove != NULL){
 					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
+					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+
 					memcpy(finalMove, tempData, sizeof(Move));
 				}
 			}
@@ -383,7 +385,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		b = beta;
 		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
 
-			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
 			memcpy(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
@@ -410,8 +412,10 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 }
 
 
+//Based on pseudocode and ideas from those articles
 //https://en.wikipedia.org/wiki/Minimax
-int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove){
+//https://www.researchgate.net/figure/MiniMax-Algorithm-Pseduo-Code-In-Fig-3-there-is-a-pseudo-code-for-NegaMax-algorithm_fig2_262672371
+int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot){
 
 	//In case we reach the depth we want return evaluation
 	if(depth == 0){	//TODO or node is terminal node
@@ -429,24 +433,24 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 
 	Position* tempPosition = malloc(sizeof(Position));
 
-	int value,bestValue,tempScore;
+	int value,tempScore;
 
 	if(ismaximizingPlayer){
 
 		value = -INFINITY;
 		while((childData = removeFirst(allMoves)) != NULL){
-			//printf("MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
+			printf("MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 			
 			memcpy(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);
 
-			tempScore = max(value, minimax(tempPosition, depth - 1, FALSE, NULL));
+			tempScore = max(value, minimax(tempPosition, depth - 1, FALSE, NULL,0));
 			//printf("\tDepth %d and val %d\n", depth, value);
 
 			if(tempScore > value){
 				value = tempScore;
-				if(finalMove != NULL){
-					//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
+				if(isRoot){
+					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 
 					memcpy(finalMove, childData, sizeof(Move));
 				}
@@ -457,12 +461,12 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 	}else{
 		value = INFINITY;
 		while((childData = removeFirst(allMoves)) != NULL){
-			//printf("MIN \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
+			printf("MIN \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 			//printf("depth %d and val %d\n", depth, value);
 			memcpy(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);
 
-			value = min(value, minimax(tempPosition, depth - 1, TRUE, NULL));
+			value = min(value, minimax(tempPosition, depth - 1, TRUE, NULL,0));
 			//printf("\tDepth %d and val %d\n", depth, value);
 
 			free(childData);

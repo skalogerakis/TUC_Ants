@@ -24,7 +24,7 @@ int evaluationFunction (Position *aPosition);
 
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
 
-int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove);
+int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot);
 
 int max(int a, int b);
 
