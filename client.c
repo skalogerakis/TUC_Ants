@@ -123,9 +123,9 @@ int main( int argc, char ** argv )
 					memcpy(tempPosition, &gamePosition, sizeof(Position));
 
 					// int minimax(Position *gamePosition, int depth, int ismaximizingPlayer, Move* finalMove){
-					//maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
+					maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
-					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
+					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
 
@@ -160,11 +160,11 @@ int main( int argc, char ** argv )
 void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion*/,int i, int j, Position *aPosition){
 	
 	int possibleJumps, playerDirection;
-	char color = move->color;
+
 	move->tile[0][k] = i;
 	move->tile[1][k] = j;
 
-	possibleJumps = canJump(i, j, color, aPosition);
+	possibleJumps = canJump(i, j, move->color, aPosition);
 
 
 	playerDirection = aPosition->turn == WHITE ? 1 : -1;
@@ -183,6 +183,7 @@ void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion
 			//copying move:
 			Move * newMove = malloc(sizeof(Move));
 			memcpy(newMove, move, sizeof(Move));
+
 			//following both left and right
 			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
 			multipleJumps(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
@@ -206,14 +207,31 @@ void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion
 	
 }
 
-LinkedList* moveFinder(Position *aPosition) {
+void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection, int moveDirection){
+	Move *move = (Move*)malloc(sizeof(Move));
+	move->color = gamePos->turn;
+	move->tile[0][0] = i;
+	move->tile[1][0] = j;
+	move->tile[0][1] = i + playerDirection;
+	move->tile[1][1] = j + moveDirection;
+	move->tile[0][2] = -1;
+
+	if(isLegal(gamePos, move)){
+		addElement(moveList, move);}
+	else
+		free(move);
+}
+
+LinkedList* moveFinder(Position *gamePos) {
+	//todo change variables here
 	int i, j, jumpPossible = 0, movePossible = 0, playerDirection;
 	LinkedList* moveList = (LinkedList*)malloc(sizeof(LinkedList));
 
+	//Jump a simple initiallization
 	moveList = LinkedListInitializer(moveList);
 	Move *move;
 
-	playerDirection = aPosition->turn == WHITE ? 1 : -1; 
+	playerDirection = gamePos->turn == WHITE ? 1 : -1; 
 
 
 	//Start iterating through the board to track all available moves
@@ -221,44 +239,49 @@ LinkedList* moveFinder(Position *aPosition) {
 	{
 		for( j = 0; j < BOARD_COLUMNS; j++)
 			{
-				if( aPosition->board[ i ][ j ] != aPosition->turn ) continue;
+				if( gamePos->board[ i ][ j ] != gamePos->turn ) continue;
 					
 					//From assignment we give priority to jumps than simple moves
-					if( canJump( i, j, aPosition->turn, aPosition ) ){
+					if( canJump( i, j, gamePos->turn, gamePos ) ){
 						//printf("JUMP POSSIBLE\n");
-						if(!jumpPossible) deleteList(moveList); //any simple moves are deleted
+						if(!jumpPossible) deleteList(moveList); //any simple moves are deleted in case we find jump moves
 						
 						move = malloc(sizeof(Move));
-						memset(move,0,sizeof(Move));
-						move->color = aPosition->turn;
-						multipleJumps(moveList, move, 0, i, j, aPosition); //FOUND! IF MORE THAN ONE JUMP POSSIBLE THEN PUSHING THE SAME MALLOC'd move
+						memset(move,0,sizeof(Move));	//Valgrid stop shouting
+						move->color = gamePos->turn;
+						multipleJumps(moveList, move, 0, i, j, gamePos); 
 						jumpPossible = 1;
-					}else if((jumpPossible == 0)){ //We come in here only when we have not found yet a jump(only simple moves)
+					}else if((jumpPossible == 0)){ 
 
-						move = (Move*)malloc(sizeof(Move));
-						move->color = aPosition->turn;
-						move->tile[0][0] = i;
-						move->tile[1][0] = j;
-						move->tile[0][1] = i + playerDirection;
-						move->tile[1][1] = j-1;
-						move->tile[0][2] = -1;
+						//Check both for left and right jump. In case we find a valid jump move add it to our list
+						simpleMove(moveList,gamePos,i,j, playerDirection,-1);
 
-						if(isLegal(aPosition, move)){
-							addElement(moveList, move);}
-						else
-							free(move);
+						simpleMove(moveList,gamePos,i,j, playerDirection,1);
+						// move = (Move*)malloc(sizeof(Move));
+						// move->color = gamePos->turn;
+						// move->tile[0][0] = i;
+						// move->tile[1][0] = j;
+						// move->tile[0][1] = i + playerDirection;
+						// move->tile[1][1] = j-1;
+						// move->tile[0][2] = -1;
 
-						move = (Move*) malloc(sizeof(Move));
-						move->color = aPosition->turn;
-						move->tile[0][0] = i;
-						move->tile[1][0] = j;
-						move->tile[0][1] = i + playerDirection;
-						move->tile[1][1] = j+1;
-						move->tile[0][2] = -1;
-						if(isLegal(aPosition, move)){
-							addElement(moveList, move);}
-						else
-							free(move);
+						// if(isLegal(gamePos, move)){
+						// 	addElement(moveList, move);}
+						// else
+						// 	free(move);
+
+						// move = (Move*) malloc(sizeof(Move));
+						// move->color = gamePos->turn;
+						// move->tile[0][0] = i;
+						// move->tile[1][0] = j;
+						// move->tile[0][1] = i + playerDirection;
+						// move->tile[1][1] = j+1;
+						// move->tile[0][2] = -1;
+
+						// if(isLegal(gamePos, move)){
+						// 	addElement(moveList, move);}
+						// else
+						// 	free(move);
 
 					}
 				
@@ -276,6 +299,41 @@ LinkedList* moveFinder(Position *aPosition) {
 						
 }
 
+// //TODO will change that eventually
+// int evaluationFunction (Position *aPosition) {
+//     int i,j, evaluation = 0;
+    
+//     for (i = 0; i < BOARD_ROWS; i++)
+//     {
+//         for ( j = 0; j < BOARD_COLUMNS; j++)
+//         {
+//             if (aPosition->board[i][j] == myColor){
+//                evaluation += 100;
+//                //printf("For piece in %d %d, of color: %d, we add...\n", i, j, myColor);
+//                if(myColor == WHITE)
+//                	evaluation += i*1;
+//                else
+//                	evaluation += (BOARD_ROWS-i-1)*1;
+
+
+//            	}
+//             else if (aPosition->board[i][j] == getOtherSide(myColor)){
+//                evaluation -= 100;
+//                //printf("For piece in %d %d, of color: %d, we sub...\n", i, j, getOtherSide(myColor));
+//                if(myColor == BLACK)
+//                	evaluation -= i*1;
+//                else
+//                	evaluation -= (BOARD_ROWS-i-1)*1;
+//            	}
+
+//         }
+//     }
+//     evaluation = evaluation + aPosition->score[myColor]*90 - aPosition->score[getOtherSide(myColor)]*90;
+
+//     return evaluation;
+// }
+
+
 //TODO will change that eventually
 int evaluationFunction (Position *aPosition) {
     int i,j, evaluation = 0;
@@ -287,20 +345,20 @@ int evaluationFunction (Position *aPosition) {
             if (aPosition->board[i][j] == myColor){
                evaluation += 100;
                //printf("For piece in %d %d, of color: %d, we add...\n", i, j, myColor);
-               if(myColor == WHITE)
-               	evaluation += i*1;
-               else
-               	evaluation += (BOARD_ROWS-i-1)*1;
+               // if(myColor == WHITE)
+               // 	evaluation += i*1;
+               // else
+               // 	evaluation += (BOARD_ROWS-i-1)*1;
 
 
            	}
             else if (aPosition->board[i][j] == getOtherSide(myColor)){
                evaluation -= 100;
                //printf("For piece in %d %d, of color: %d, we sub...\n", i, j, getOtherSide(myColor));
-               if(myColor == BLACK)
-               	evaluation -= i*1;
-               else
-               	evaluation -= (BOARD_ROWS-i-1)*1;
+               // if(myColor == BLACK)
+               // 	evaluation -= i*1;
+               // else
+               // 	evaluation -= (BOARD_ROWS-i-1)*1;
            	}
 
         }
@@ -309,18 +367,16 @@ int evaluationFunction (Position *aPosition) {
 
     return evaluation;
 }
-int max(int a, int b)
-{
-	if (a > b)
-		return a;
-	return b;
-}
-int min(int a, int b)
-{
-	if(a < b)
-		return a;
-	return b;
-}
+
+int max(int num1, int num2){
+	return (num1 > num2) ? num1 : num2;
+} 
+
+
+int min(int num1, int num2){
+	return (num1 < num2) ? num1 : num2;
+} 
+
 
 
 //https://www.javatpoint.com/ai-alpha-beta-pruning

@@ -18,7 +18,7 @@ LinkedList* moveFinder(Position *gamePosition);
 
 void multipleJumps(LinkedList* moveList, Move* move, int k, int i, int j,Position *gamePosition);
 
-LinkedList* simpleMove(LinkedList *mylinkedlist,Position *gamePosition, int i, int j);
+//LinkedList* simpleMove(LinkedList *mylinkedlist,Position *gamePosition, int i, int j);
 
 int evaluationFunction (Position *aPosition);
 
@@ -26,9 +26,11 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot);
 
-int max(int a, int b);
+void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection,int moveDirection);
 
-int min(int a, int b);
+int max(int num1, int num2);
+
+int min(int num1, int num2);
 
 
 /************************************************
