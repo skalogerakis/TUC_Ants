@@ -24,9 +24,14 @@ int evaluationFunction (Position *aPosition);
 
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
 
+int alpha_beta1(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
+
+
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot);
 
 void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection,int moveDirection);
+
+void moveLegality(LinkedList* moveList, Move* move, Position* gamePos);
 
 int max(int num1, int num2);
 
@@ -55,4 +60,4 @@ void addElement(LinkedList *myList ,Move *data);
 //Removes first element from list
 Move* removeFirst(LinkedList *myList );
 
-void emptyList(LinkedList *myList);
+//void emptyList(LinkedList *myList);

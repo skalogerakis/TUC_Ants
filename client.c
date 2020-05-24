@@ -12,7 +12,7 @@
 #include "client.h"
 #include <sys/time.h>
 
-#define MAX_DEPTH 2
+#define MAX_DEPTH 3
 #define INFINITY 999999999
 
 // #define MAX_TIME 7
@@ -120,12 +120,16 @@ int main( int argc, char ** argv )
 					int maxScore = -INFINITY;
 
 					Position* tempPosition = malloc(sizeof(Position));
-					memcpy(tempPosition, &gamePosition, sizeof(Position));
+					memmove(tempPosition, &gamePosition, sizeof(Position));
+
+					//myMove = initRandom(myColor);
 
 					// int minimax(Position *gamePosition, int depth, int ismaximizingPlayer, Move* finalMove){
 					maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
 					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
+					// maxScore = alpha_beta1(tempPosition, MAX_DEPTH, -INFINITY, INFINITY, 1, &myMove);
+
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
 
@@ -156,57 +160,69 @@ int main( int argc, char ** argv )
 	return 0;
 }
 
-
-void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion*/,int i, int j, Position *aPosition){
+/*
+	Jump cases using this function.
+*/
+void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion*/,int i, int j, Position *gamePos){
 	
-	int possibleJumps, playerDirection;
+	int jumpDir, playerDir;
 
 	move->tile[0][k] = i;
 	move->tile[1][k] = j;
 
-	possibleJumps = canJump(i, j, move->color, aPosition);
+	jumpDir = canJump(i, j, move->color, gamePos);
 
 
-	playerDirection = aPosition->turn == WHITE ? 1 : -1;
+	playerDir = gamePos->turn == WHITE ? 1 : -1;
 
-	if(possibleJumps){
-		if(possibleJumps == 1) //can jump left
-		{
-			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
+	//Find all possible jumps recursively until no other jumps are available
+	switch(jumpDir)
+	{
+		case 1:
+			multipleJumps(moveList, move, k+1, i + 2*playerDir, j-2, gamePos);
 			return;
-		}else if(possibleJumps == 2) //can jump right
-		{
-			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j+2, aPosition);
+		case 2:
+			multipleJumps(moveList, move, k+1, i + 2*playerDir, j+2, gamePos);
 			return;
-		}else if(possibleJumps == 3) //we need to split the jumps
-		{
-			//copying move:
-			Move * newMove = malloc(sizeof(Move));
-			memcpy(newMove, move, sizeof(Move));
+		case 3:	//Both left and right jumps are available, so duplicate move and move on both ways
+			{
+				Move *newMove = malloc(sizeof(Move));
+				memmove(newMove, move, sizeof(Move));
 
-			//following both left and right
-			multipleJumps(moveList, move, k+1, i + 2*playerDirection, j-2, aPosition);
-			multipleJumps(moveList, newMove, k+1, i + 2*playerDirection, j+2, aPosition);
+				//following both left and right jump
+				multipleJumps(moveList, move, k+1, i + 2*playerDir, j-2, gamePos);
+				multipleJumps(moveList, newMove, k+1, i + 2*playerDir, j+2, gamePos);
+				return;
+			}
+		default:
+			//When we reach here we are out of jumps so 
+			if( k + 1 != MAXIMUM_MOVE_SIZE ){
+				move->tile[0][k+1] = -1;
+			}
+
+			moveLegality(moveList, move, gamePos);
 			return;
-
-		}
 	}
 
-
-	if( k + 1 != MAXIMUM_MOVE_SIZE ){
-		move->tile[0][k+1] = -1;
-	}
-
-
-	if(isLegal(aPosition, move)){
-		addElement(moveList, move);
-		}
-	else
-		free(move);
 	return;
 	
 }
 
+/*
+	Check if move is legal and adds them in our list if true
+*/
+void moveLegality(LinkedList* moveList, Move* move, Position* gamePos){
+	if(isLegal(gamePos, move))
+		addElement(moveList, move);
+	else
+		free(move);
+
+	return;
+}
+
+/*
+	Function responsible to handle simple moves(both left and right)
+*/
 void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection, int moveDirection){
 	Move *move = (Move*)malloc(sizeof(Move));
 	move->color = gamePos->turn;
@@ -216,12 +232,14 @@ void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playe
 	move->tile[1][1] = j + moveDirection;
 	move->tile[0][2] = -1;
 
-	if(isLegal(gamePos, move)){
-		addElement(moveList, move);}
-	else
-		free(move);
+	//In case illegal move free 
+	moveLegality(moveList, move, gamePos);
+	return;
 }
 
+/*
+	Function responsible to track all available moves(Simple moves and jumps)
+*/
 LinkedList* moveFinder(Position *gamePos) {
 	//todo change variables here
 	int i, j, jumpPossible = 0, movePossible = 0, playerDirection;
@@ -246,6 +264,7 @@ LinkedList* moveFinder(Position *gamePos) {
 						//printf("JUMP POSSIBLE\n");
 						if(!jumpPossible) deleteList(moveList); //any simple moves are deleted in case we find jump moves
 						
+						//In contrary with simple move we create move before and we pass as parameter. Everything needs to store in the same move
 						move = malloc(sizeof(Move));
 						memset(move,0,sizeof(Move));	//Valgrid stop shouting
 						move->color = gamePos->turn;
@@ -257,32 +276,7 @@ LinkedList* moveFinder(Position *gamePos) {
 						simpleMove(moveList,gamePos,i,j, playerDirection,-1);
 
 						simpleMove(moveList,gamePos,i,j, playerDirection,1);
-						// move = (Move*)malloc(sizeof(Move));
-						// move->color = gamePos->turn;
-						// move->tile[0][0] = i;
-						// move->tile[1][0] = j;
-						// move->tile[0][1] = i + playerDirection;
-						// move->tile[1][1] = j-1;
-						// move->tile[0][2] = -1;
-
-						// if(isLegal(gamePos, move)){
-						// 	addElement(moveList, move);}
-						// else
-						// 	free(move);
-
-						// move = (Move*) malloc(sizeof(Move));
-						// move->color = gamePos->turn;
-						// move->tile[0][0] = i;
-						// move->tile[1][0] = j;
-						// move->tile[0][1] = i + playerDirection;
-						// move->tile[1][1] = j+1;
-						// move->tile[0][2] = -1;
-
-						// if(isLegal(gamePos, move)){
-						// 	addElement(moveList, move);}
-						// else
-						// 	free(move);
-
+					
 					}
 				
 			}
@@ -377,9 +371,128 @@ int min(int num1, int num2){
 	return (num1 < num2) ? num1 : num2;
 } 
 
+/*
+	Random implementation as give from assignment files
+*/
+Move initRandom(char myColor, Position *aPosition){
+
+	int i, j, k;
+	int jumpPossible;
+	int playerDirection;
+
+	LinkedList *moves = moveFinder(aPosition);
+
+	printAvailableMoves(moves);
+
+	removeFirst(moves);
 
 
-//https://www.javatpoint.com/ai-alpha-beta-pruning
+
+	if( myColor == WHITE )		// find movement's direction
+		playerDirection = 1;
+	else
+		playerDirection = -1;
+
+	jumpPossible = FALSE;		// determine if we have a jump available
+	for( i = 0; i < BOARD_ROWS; i++ )
+	{
+		for( j = 0; j < BOARD_COLUMNS; j++ )
+		{
+			if( gamePosition.board[ i ][ j ] == myColor )
+			{
+				if( canJump( i, j, myColor, &gamePosition ) )
+					jumpPossible = TRUE;
+			}
+		}
+	}
+
+	while( 1 )
+	{
+		i = rand() % (BOARD_ROWS);
+		j = rand() % BOARD_COLUMNS;
+
+		if( gamePosition.board[ i ][ j ] == myColor )		//find a piece of ours
+		{
+
+			myMove.tile[ 0 ][ 0 ] = i;		//piece we are going to move
+			myMove.tile[ 1 ][ 0 ] = j;
+
+			if( jumpPossible == FALSE )
+			{
+				myMove.tile[ 0 ][ 1 ] = i + 1 * playerDirection;
+				myMove.tile[ 0 ][ 2 ] = -1;
+				if( rand() % 2 == 0 )	//with 50% chance try left and then right
+				{
+					myMove.tile[ 1 ][ 1 ] = j - 1;
+					if( isLegal( &gamePosition, &myMove ))
+						break;
+
+					myMove.tile[ 1 ][ 1 ] = j + 1;
+					if( isLegal( &gamePosition, &myMove ))
+						break;
+				}
+				else	//the other 50%...try right first and then left
+				{
+					myMove.tile[ 1 ][ 1 ] = j + 1;
+					if( isLegal( &gamePosition, &myMove ))
+						break;
+
+					myMove.tile[ 1 ][ 1 ] = j - 1;
+					if( isLegal( &gamePosition, &myMove ))
+						break;
+				}
+			}
+			else	//jump possible
+			{
+				if( canJump( i, j, myColor, &gamePosition ) )
+				{
+					k = 1;
+					while( canJump( i, j, myColor, &gamePosition ) != 0 )
+					{
+						myMove.tile[ 0 ][ k ] = i + 2 * playerDirection;
+						if( rand() % 2 == 0 )	//50% chance
+						{
+
+							if( canJump( i, j, myColor, &gamePosition ) % 2 == 1 )		//left jump possible
+								myMove.tile[ 1 ][ k ] = j - 2;
+							else
+								myMove.tile[ 1 ][ k ] = j + 2;
+
+						}
+						else	//50%
+						{
+
+							if( canJump( i, j, myColor, &gamePosition ) > 1 )		//right jump possible
+								myMove.tile[ 1 ][ k ] = j + 2;
+							else
+								myMove.tile[ 1 ][ k ] = j - 2;
+
+						}
+
+						if( k + 1 == MAXIMUM_MOVE_SIZE )	//maximum tiles reached
+							break;
+
+						myMove.tile[ 0 ][ k + 1 ] = -1;		//maximum tiles not reached
+
+						i = myMove.tile[ 0 ][ k ];		//we will try to jump from this point in the next loop
+						j = myMove.tile[ 1 ][ k ];
+
+
+						k++;
+					}
+					break;
+				}
+			}
+		}
+
+	}
+
+	return myMove;
+
+}
+
+// //https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+// //https://www.javatpoint.com/ai-alpha-beta-pruning
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
 	
 
@@ -407,10 +520,10 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		g = -INFINITY;
 		a = alpha;
 		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
-			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
 
-			memcpy(tempPosition, aPosition, sizeof(Position));
+			memmove(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
 
 			tempScore = alpha_beta(tempPosition, depth-1, a, beta, 0, NULL);
@@ -422,9 +535,9 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 				g = tempScore;
 				if(finalMove != NULL){
 					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
-					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+					//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
-					memcpy(finalMove, tempData, sizeof(Move));
+					memmove(finalMove, tempData, sizeof(Move));
 				}
 			}
 			a = max(a, g);
@@ -441,9 +554,9 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 		b = beta;
 		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
 
-			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
-			memcpy(tempPosition, aPosition, sizeof(Position));
+			memmove(tempPosition, aPosition, sizeof(Position));
 			doMove(tempPosition, tempData);
 			//printf("MINIMIZER Searching Move on depth %d:\n", depth);
 			//printf("Searching Move on depth %d:\n", depth);
@@ -467,6 +580,107 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 	return g;
 }
 
+//https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+//https://www.javatpoint.com/ai-alpha-beta-pruning
+int alpha_beta1(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
+	
+
+	if (depth <= 0){ //if we reached the maximum depth of our recursion and there are no captures we can see
+			return evaluationFunction(aPosition); //return heuristic
+	}
+
+	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
+	Move *tempData = NULL;
+
+
+	if (moveList == NULL || moveList->head == NULL){     //If for any reason, no more moves are available
+		deleteList(moveList);
+		return evaluationFunction(aPosition);
+	}
+
+	Position* tempPosition = malloc(sizeof(Position));
+	int tempScore, value;
+
+	//int a, b;
+
+
+	if (maximizingPlayer){
+
+		value = -INFINITY;
+		//a = alpha;
+		//while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
+		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
+
+			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+
+
+			memmove(tempPosition, aPosition, sizeof(Position));
+			doMove(tempPosition, tempData);
+
+			tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, NULL);
+
+			// value = max(value, tempScore);
+
+			//tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, NULL);
+
+			//tempScore = max(value, alpha_beta(tempPosition, depth-1, alpha, beta, 0, NULL));
+			
+
+			if(value < tempScore){
+			 	value = tempScore;
+			// 	printf("Yo we are here\n");
+				if(finalMove != NULL){
+					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
+					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+
+					memmove(finalMove, tempData, sizeof(Move));
+				}
+			}
+			//value = tempScore;
+			alpha = max(alpha, value);
+			//alpha = max(alpha, tempScore);
+			if( beta <= alpha){ free(tempData); break;}
+			free(tempData);
+		}
+		return value;
+		/*
+		freeList(moveList);
+		free(tempPosition);
+
+		return alpha;*/
+	}else{
+		value = INFINITY;
+		//b = beta;
+		//while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
+		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
+
+			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+
+			memmove(tempPosition, aPosition, sizeof(Position));
+			doMove(tempPosition, tempData);
+			//printf("MINIMIZER Searching Move on depth %d:\n", depth);
+			//printf("Searching Move on depth %d:\n", depth);
+			//printMove(tempData);
+			// tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 1, NULL);
+			
+			value = min(value, alpha_beta(tempPosition, depth-1, alpha, beta, 1, NULL));
+			beta = min(beta, value);
+
+			if( beta <= alpha){ free(tempData); break;}
+			free(tempData);
+		}
+		return value;
+		/*
+
+		return beta;
+		*/
+	}
+
+	deleteList(moveList);
+	free(tempPosition);
+	// return g;
+}
+
 
 //Based on pseudocode and ideas from those articles
 //https://en.wikipedia.org/wiki/Minimax
@@ -474,7 +688,7 @@ int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximi
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot){
 
 	//In case we reach the depth we want return evaluation
-	if(depth == 0){	//TODO or node is terminal node
+	if(depth == 0){
 		return evaluationFunction(gamePos);
 	}
 
@@ -497,18 +711,17 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 		while((childData = removeFirst(allMoves)) != NULL){
 			printf("MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 			
-			memcpy(tempPosition, gamePos, sizeof(Position));
+			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);
 
-			tempScore = max(value, minimax(tempPosition, depth - 1, FALSE, NULL,0));
+			tempScore = max(value, minimax(tempPosition, depth - 1, FALSE, finalMove,0));
 			//printf("\tDepth %d and val %d\n", depth, value);
 
 			if(tempScore > value){
 				value = tempScore;
 				if(isRoot){
 					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
-
-					memcpy(finalMove, childData, sizeof(Move));
+					memmove(finalMove, childData, sizeof(Move));
 				}
 			}
 			free(childData);
@@ -519,10 +732,10 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 		while((childData = removeFirst(allMoves)) != NULL){
 			printf("MIN \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 			//printf("depth %d and val %d\n", depth, value);
-			memcpy(tempPosition, gamePos, sizeof(Position));
+			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);
 
-			value = min(value, minimax(tempPosition, depth - 1, TRUE, NULL,0));
+			value = min(value, minimax(tempPosition, depth - 1, TRUE, finalMove,0));
 			//printf("\tDepth %d and val %d\n", depth, value);
 
 			free(childData);
