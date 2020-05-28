@@ -2,7 +2,6 @@
 #include "board.h"
 #include "move.h"
 #include "comm.h"
-// #include "list.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,10 +11,10 @@
 #include "client.h"
 #include <sys/time.h>
 
-#define MAX_DEPTH 3
+#define MAX_DEPTH 8
 #define INFINITY 999999999
 
-// #define MAX_TIME 7
+#define MAX_TIME 3
 /**********************************************************/
 Position gamePosition;		// Position we are going to use
 
@@ -37,6 +36,7 @@ char * ip = "127.0.0.1";	// default ip (local machine)
 //          --verbose \
 //          --log-file=valgrind-out.txt  ./client
 
+//TODO mess with bit improvements
 
 int main( int argc, char ** argv )
 {
@@ -124,11 +124,11 @@ int main( int argc, char ** argv )
 
 					//myMove = initRandom(myColor);
 
-					// int minimax(Position *gamePosition, int depth, int ismaximizingPlayer, Move* finalMove){
-					maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
+					//maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
-					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove);
+					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
 					// maxScore = alpha_beta1(tempPosition, MAX_DEPTH, -INFINITY, INFINITY, 1, &myMove);
+					//maxScore = iterativeDeepening(tempPosition, &myMove);
 
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
@@ -491,194 +491,159 @@ Move initRandom(char myColor, Position *aPosition){
 
 }
 
-// //https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
-// //https://www.javatpoint.com/ai-alpha-beta-pruning
-int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
-	
+// https://en.wikipedia.org/wiki/Quiescence_search
+/*
+	Classic implementation with only captures are taken into account
+	 Check there are no hidden traps and to get a better estimate of its value. 
+	 Quiescence search attempts to mitigate the horizon effect(a problem in artificial intelligence which can occur when all moves from a given node in a game tree are searched to a fixed depth) 
+	 by extending the search depth in volatile positions where the heuristic value may have significant fluctuations between moves.
+*/
+int quiescenceSearch(Position* gamePos){
+		int i, j, playerDirection;
+		//quiescence search
+		// determine if we have a jump available
 
-	if (depth <= 0){ //if we reached the maximum depth of our recursion and there are no captures we can see
-			return evaluationFunction(aPosition); //return heuristic
+		playerDirection = gamePos->turn == WHITE ? 1 : -1; 
+
+		for( i = 0; i < BOARD_ROWS; i++ )
+		{
+			for( j = 0; j < BOARD_COLUMNS; j++ )
+			{
+				if( gamePos->board[ i ][ j ] == gamePos->turn )
+				{
+										
+					// if( canJump( i, j, gamePos->turn, gamePos ) || (i + playerDirection == (BOARD_ROWS-1)) || (i + playerDirection == 0)){
+					//Tried to make posistion next to finish not quiet and get a better position but could not handle it in time. TODO ADD IMPROVED EVALUATION IN THAT CASE
+					if( canJump( i, j, gamePos->turn, gamePos )){
+						return TRUE;
+					}
+				}
+			}
+		}
+		return FALSE;
+}
+
+/*
+	https://stackoverflow.com/questions/41756443/how-to-implement-iterative-deepening-with-alpha-beta-pruning
+	TODO PASS TIME TO OUR ALPHA BETA IN CASE NO OTHER IMPLEMENTATion. TODO REVISIT THAT
+	https://github.com/nealyoung/CS171/blob/master/AI.java
+*/
+int iterativeDeepeningSearch(Position* gamePos, Move* finalMove)
+{
+	int f = evaluationFunction(gamePos); //first guess TODO check that
+	char d=1;
+	// clock_t cstart = clock();
+	/*
+		Handle Time in C
+		https://stackoverflow.com/questions/19084596/how-to-use-seconds-time-in-c-program-as-a-counter
+	*/
+	clock_t startTime;
+	double timeElapsed;
+
+	startTime = clock();
+	//TODO change that as well	
+	while(1)
+	{
+
+		// f = MTDF(aPosition, f, d, finalMove);
+		f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
+
+		timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
+        if (timeElapsed >= MAX_TIME ||(d > MAX_DEPTH) ){
+        	printf("Time timeElapsed\n");
+           	printf("======================================================\n");
+			printf("Max Score: %d\n", f);
+			printf("Time used: %f\n", timeElapsed);
+			printf("Depth of iteration: %d\n", d);
+			printf("======================================================\n");
+			break;
+        }
+        
+		d +=1;
+
+	}
+	return f;
+}
+
+
+
+//https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+//https://www.javatpoint.com/ai-alpha-beta-pruning
+/*
+	Alpha beta pruning implementation in similar fashion with minimax
+*/
+int alpha_beta(Position *gamePos, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove, int isRoot){  
+	
+	//In case we reached the maximum availanle depth and we are in quiet position return evalution 
+	if (depth <= 0){
+		if(!quiescenceSearch(gamePos)){	// In case we are not in a quiet position keep on with the recursion until we reach that point
+			return evaluationFunction(gamePos); 
+		}
 	}
 
-	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
+	LinkedList *moveList = moveFinder(gamePos);   //finding all legal moves in this position
 	Move *tempData = NULL;
 
 
-	if (moveList == NULL || moveList->head == NULL){     //If for any reason, no more moves are available
+	if (moveList == NULL || moveList->head == NULL){     //If no more moves available
 		deleteList(moveList);
-		return evaluationFunction(aPosition);
+		return evaluationFunction(gamePos);
 	}
 
 	Position* tempPosition = malloc(sizeof(Position));
-	int tempScore, g;
-
-	int a, b;
-
+	int tempScore, value;
 
 	if (maximizingPlayer){
 
-		g = -INFINITY;
-		a = alpha;
-		while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
+		value = -INFINITY;
+		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
+
 			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
-
-
-			memmove(tempPosition, aPosition, sizeof(Position));
+			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, tempData);
 
-			tempScore = alpha_beta(tempPosition, depth-1, a, beta, 0, NULL);
+			tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, finalMove,0);
 
-			//g = max(g, tempScore);
-			
-
-			if(g < tempScore){
-				g = tempScore;
-				if(finalMove != NULL){
+			if(value < tempScore){
+			 	value = tempScore;
+				if(isRoot){
 					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
 					//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
 					memmove(finalMove, tempData, sizeof(Move));
 				}
 			}
-			a = max(a, g);
-			//alpha = max(alpha, tempScore);
-			//if( beta <= alpha){ free(tempData); break;}
-			free(tempData);
-		}/*
-		freeList(moveList);
-		free(tempPosition);
 
-		return alpha;*/
-	}else{
-		g = INFINITY;
-		b = beta;
-		while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
-
-			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
-
-			memmove(tempPosition, aPosition, sizeof(Position));
-			doMove(tempPosition, tempData);
-			//printf("MINIMIZER Searching Move on depth %d:\n", depth);
-			//printf("Searching Move on depth %d:\n", depth);
-			//printMove(tempData);
-			tempScore = alpha_beta(tempPosition, depth-1, alpha, b, 1, NULL);
-			
-			g = min(g, tempScore);
-			b = min(b, g);
-
-			//if( beta <= alpha){ free(tempData); break;}
-			free(tempData);
-		}
-		/*
-
-		return beta;
-		*/
-	}
-
-	deleteList(moveList);
-	free(tempPosition);
-	return g;
-}
-
-//https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
-//https://www.javatpoint.com/ai-alpha-beta-pruning
-int alpha_beta1(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove){  //recursive minimax function.
-	
-
-	if (depth <= 0){ //if we reached the maximum depth of our recursion and there are no captures we can see
-			return evaluationFunction(aPosition); //return heuristic
-	}
-
-	LinkedList *moveList = moveFinder(aPosition);   //finding all legal moves in this position
-	Move *tempData = NULL;
-
-
-	if (moveList == NULL || moveList->head == NULL){     //If for any reason, no more moves are available
-		deleteList(moveList);
-		return evaluationFunction(aPosition);
-	}
-
-	Position* tempPosition = malloc(sizeof(Position));
-	int tempScore, value;
-
-	//int a, b;
-
-
-	if (maximizingPlayer){
-
-		value = -INFINITY;
-		//a = alpha;
-		//while((g<beta)&&((tempData = removeFirst(moveList)) != NULL)){ //for each child position
-		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
-
-			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
-
-
-			memmove(tempPosition, aPosition, sizeof(Position));
-			doMove(tempPosition, tempData);
-
-			tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, NULL);
-
-			// value = max(value, tempScore);
-
-			//tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, NULL);
-
-			//tempScore = max(value, alpha_beta(tempPosition, depth-1, alpha, beta, 0, NULL));
-			
-
-			if(value < tempScore){
-			 	value = tempScore;
-			// 	printf("Yo we are here\n");
-				if(finalMove != NULL){
-					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
-					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
-
-					memmove(finalMove, tempData, sizeof(Move));
-				}
-			}
-			//value = tempScore;
 			alpha = max(alpha, value);
-			//alpha = max(alpha, tempScore);
-			if( beta <= alpha){ free(tempData); break;}
+			if( beta <= alpha){ 
+				free(tempData); 
+				break;
+			}
 			free(tempData);
 		}
 		return value;
-		/*
-		freeList(moveList);
-		free(tempPosition);
 
-		return alpha;*/
 	}else{
 		value = INFINITY;
-		//b = beta;
-		//while((g>alpha)&&(tempData = removeFirst(moveList)) != NULL){ //for each child position
+		//b = beta;											//for each child position
 		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
 
-			printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
-			memmove(tempPosition, aPosition, sizeof(Position));
+			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, tempData);
-			//printf("MINIMIZER Searching Move on depth %d:\n", depth);
-			//printf("Searching Move on depth %d:\n", depth);
-			//printMove(tempData);
-			// tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 1, NULL);
-			
-			value = min(value, alpha_beta(tempPosition, depth-1, alpha, beta, 1, NULL));
+			//printf("MINIMIZER Searching Move on depth %d:\n", depth);			
+			value = min(value, alpha_beta(tempPosition, depth-1, alpha, beta, 1, finalMove, 0));
 			beta = min(beta, value);
 
 			if( beta <= alpha){ free(tempData); break;}
 			free(tempData);
 		}
 		return value;
-		/*
-
-		return beta;
-		*/
 	}
 
 	deleteList(moveList);
 	free(tempPosition);
-	// return g;
 }
 
 
@@ -709,7 +674,7 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 
 		value = -INFINITY;
 		while((childData = removeFirst(allMoves)) != NULL){
-			printf("MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
+			//printf("MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 			
 			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);
@@ -720,7 +685,7 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 			if(tempScore > value){
 				value = tempScore;
 				if(isRoot){
-					printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
+			//		printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 					memmove(finalMove, childData, sizeof(Move));
 				}
 			}
@@ -730,7 +695,7 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 	}else{
 		value = INFINITY;
 		while((childData = removeFirst(allMoves)) != NULL){
-			printf("MIN \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
+			// printf("MIN \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
 			//printf("depth %d and val %d\n", depth, value);
 			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);

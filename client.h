@@ -22,9 +22,12 @@ void multipleJumps(LinkedList* moveList, Move* move, int k, int i, int j,Positio
 
 int evaluationFunction (Position *aPosition);
 
-int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
+int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove, int isRoot);
 
-int alpha_beta1(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
+
+int quiescenceSearch(Position* gamePos);
+
+//int alpha_beta1(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
 
 
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot);
@@ -32,6 +35,8 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection,int moveDirection);
 
 void moveLegality(LinkedList* moveList, Move* move, Position* gamePos);
+
+int iterativeDeepeningSearch(Position* aPosition, Move* finalMove);
 
 int max(int num1, int num2);
 

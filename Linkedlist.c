@@ -91,24 +91,6 @@ while (current != NULL)
 myList->head = NULL;  
 }  
 
-// //TODO GET RID OF THAT
-// void emptyList(LinkedList *myList){
-// 	LinkedList *ptrNext;
-
-//    	if(myList->head == NULL || myList == NULL){
-//    		printf("List is empty\n");
-//    		return;
-//    	}
-
-//    	while(myList->head != NULL){
-// 		ptrNext = myList->head->next;
-// 		//free(myList->head);
-//    		myList->head = ptrNext;
-//    	}
-
-//    	//printf("List deleted successfully\n");
-// }
-
 
 void addElement(LinkedList *myList ,Move* data){
 	LinkedList *newElem = (LinkedList*)malloc(sizeof(LinkedList));
