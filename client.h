@@ -18,7 +18,6 @@ LinkedList* moveFinder(Position *gamePosition);
 
 void multipleJumps(LinkedList* moveList, Move* move, int k, int i, int j,Position *gamePosition);
 
-//LinkedList* simpleMove(LinkedList *mylinkedlist,Position *gamePosition, int i, int j);
 
 int evaluationFunction (Position *aPosition);
 
@@ -37,6 +36,9 @@ void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playe
 void moveLegality(LinkedList* moveList, Move* move, Position* gamePos);
 
 int iterativeDeepeningSearch(Position* aPosition, Move* finalMove);
+
+int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove);
+
 
 int max(int num1, int num2);
 

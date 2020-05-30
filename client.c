@@ -126,10 +126,11 @@ int main( int argc, char ** argv )
 
 					//maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
-					maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
+					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
 					// maxScore = alpha_beta1(tempPosition, MAX_DEPTH, -INFINITY, INFINITY, 1, &myMove);
 					//maxScore = iterativeDeepening(tempPosition, &myMove);
-
+					// MTDF(Position* aPosition, int f, char d, Move* finalMove)
+					maxScore = MTDFSearch(tempPosition, evaluationFunction(tempPosition) ,MAX_DEPTH, &myMove);
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
 
@@ -542,14 +543,35 @@ int iterativeDeepeningSearch(Position* gamePos, Move* finalMove)
 
 	startTime = clock();
 	//TODO change that as well	
-	while(1)
-	{
+	// while(1)
+	// {
 
-		// f = MTDF(aPosition, f, d, finalMove);
+	// 	// f = MTDF(aPosition, f, d, finalMove);
+	// 	f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
+
+	// 	timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
+ //        if (timeElapsed >= MAX_TIME ||(d > MAX_DEPTH) ){
+ //        	printf("Time timeElapsed\n");
+ //           	printf("======================================================\n");
+	// 		printf("Max Score: %d\n", f);
+	// 		printf("Time used: %f\n", timeElapsed);
+	// 		printf("Depth of iteration: %d\n", d);
+	// 		printf("======================================================\n");
+	// 		break;
+ //        }
+        
+	// 	d +=1;
+
+	// }
+	// return f;
+
+	//NEW CHECK THAT
+	//https://homepages.cwi.nl/~paulk/theses/Carolus.pdf
+	for(d = 1; d <= MAX_DEPTH; d++){
 		f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
 
 		timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
-        if (timeElapsed >= MAX_TIME ||(d > MAX_DEPTH) ){
+        if (timeElapsed >= MAX_TIME){
         	printf("Time timeElapsed\n");
            	printf("======================================================\n");
 			printf("Max Score: %d\n", f);
@@ -558,14 +580,51 @@ int iterativeDeepeningSearch(Position* gamePos, Move* finalMove)
 			printf("======================================================\n");
 			break;
         }
-        
-		d +=1;
-
 	}
 	return f;
 }
 
 
+
+/*
+	Also read for report
+	THIS USES WHAT WE WANT https://www.cs.unm.edu/~aaron/downloads/qian_search.pdf
+	https://en.wikipedia.org/wiki/MTD-f
+	https://www.chessprogramming.org/MTD(f)
+	https://people.csail.mit.edu/plaat/mtdf.html ALSO TIME ITERATIVE DEEEPENING
+*/
+
+
+int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove){
+	int beta;
+	//int g = f;
+	//f = evaluationFunction(gamePos);
+	int score = f;
+	int upperBound = INFINITY;
+	int lowerBound = - INFINITY;
+
+	//Move* aMove = malloc(sizeof(Move));
+	do
+	{
+		if (score == lowerBound)
+			beta = score + 1;
+		else
+			beta = score;
+
+		score = alpha_beta(gamePos, d, beta-1, beta, 1, finalMove,1);
+		if (score < beta){
+			upperBound = score;
+			
+		}else{ //keeping move
+			//memcpy(finalMove, aMove, sizeof(Move));
+			lowerBound = score;
+		}
+	}while(lowerBound < upperBound);
+	// free(aMove);;
+	return score;
+
+
+}
 
 //https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
 //https://www.javatpoint.com/ai-alpha-beta-pruning
