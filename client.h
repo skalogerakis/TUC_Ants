@@ -16,7 +16,7 @@ Move* newRandom(char myColor, Position *aPosition);
 
 LinkedList* moveFinder(Position *gamePosition);
 
-void multipleJumps(LinkedList* moveList, Move* move, int k, int i, int j,Position *gamePosition);
+void multipleJumps(LinkedList* moveList, Move* move, short k ,short i, short j, Position *gamePos);
 
 
 int evaluationFunction (Position *aPosition);
@@ -24,20 +24,22 @@ int evaluationFunction (Position *aPosition);
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove, int isRoot);
 
 
-int quiescenceSearch(Position* gamePos);
+short quiescenceSearch(Position* gamePos);
 
 //int alpha_beta1(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove);
 
 
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot);
 
-void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection,int moveDirection);
+void simpleMove(LinkedList* moveList, Position *gamePos, short i, short j, short playerDirection, short moveDirection);
 
 void moveLegality(LinkedList* moveList, Move* move, Position* gamePos);
 
 int iterativeDeepeningSearch(Position* aPosition, Move* finalMove);
 
 int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove);
+
+int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove);
 
 
 int max(int num1, int num2);
@@ -68,3 +70,16 @@ void addElement(LinkedList *myList ,Move *data);
 Move* removeFirst(LinkedList *myList );
 
 //void emptyList(LinkedList *myList);
+
+
+
+short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, short j, short playerDirection, short jumpPossible);
+
+struct
+{
+	unsigned int jumpDirection : 3;
+	int playDirection : 3;
+	unsigned int jumpFlag :1;
+	int playMoveDirection : 3;
+} MoveUtil;
+

@@ -433,12 +433,76 @@ int isLegal( Position * pos, Move * moveToCheck )
 			return FALSE;
 
 		/*seems legal..but we cannot be sure until we check if any jump is available*/
-		for( i = 0; i < BOARD_ROWS; i++ )
+		for( i = 0; i < BOARD_ROWS; i+=4 )
 		{
-			for( j = 0; j < BOARD_COLUMNS; j++ )
-			{
+			for( j = 0; j < BOARD_COLUMNS; j+=4 )
+			{	
+				//For j
 				if( pos->board[ i ][ j ] == moveToCheck->color )
 					if( canJump( i, j, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+1 ][ j ] == moveToCheck->color )
+					if( canJump( i+1, j, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+2 ][ j ] == moveToCheck->color )
+					if( canJump( i+2, j, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+3 ][ j ] == moveToCheck->color )
+					if( canJump( i+3, j, moveToCheck->color, pos ) )
+						return FALSE;
+
+				//For j+1
+				if( pos->board[ i ][ j+1 ] == moveToCheck->color )
+					if( canJump( i, j+1, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+1 ][ j+1 ] == moveToCheck->color )
+					if( canJump( i+1, j+1, moveToCheck->color, pos ) )
+						return FALSE;
+				
+				if( pos->board[ i+2 ][ j+1 ] == moveToCheck->color )
+					if( canJump( i+2, j+1, moveToCheck->color, pos ) )
+						return FALSE;
+				
+				if( pos->board[ i+3 ][ j+1 ] == moveToCheck->color )
+					if( canJump( i+3, j+1, moveToCheck->color, pos ) )
+						return FALSE;
+				
+				//For j+2
+				if( pos->board[ i ][ j+2 ] == moveToCheck->color )
+					if( canJump( i, j+2, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+1 ][ j+2 ] == moveToCheck->color )
+					if( canJump( i+1, j+2, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+2 ][ j+2 ] == moveToCheck->color )
+					if( canJump( i+2, j+2, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+3 ][ j+2 ] == moveToCheck->color )
+					if( canJump( i+3, j+2, moveToCheck->color, pos ) )
+						return FALSE;
+				
+				//For j+2
+				if( pos->board[ i ][ j+3 ] == moveToCheck->color )
+					if( canJump( i, j+3, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+1 ][ j+3 ] == moveToCheck->color )
+					if( canJump( i+1, j+3, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+2 ][ j+3 ] == moveToCheck->color )
+					if( canJump( i+2, j+3, moveToCheck->color, pos ) )
+						return FALSE;
+
+				if( pos->board[ i+3 ][ j+3 ] == moveToCheck->color )
+					if( canJump( i+3, j+3, moveToCheck->color, pos ) )
 						return FALSE;
 			}
 		}

@@ -10,11 +10,14 @@
 #include <string.h>
 #include "client.h"
 #include <sys/time.h>
+#include <limits.h>
 
-#define MAX_DEPTH 8
-#define INFINITY 999999999
+#define MAX_DEPTH 10
 
-#define MAX_TIME 3
+//USHRT_MAX has value 65535. It seems highly unlikely that we will encouter with a larger value
+#define INFINITY USHRT_MAX
+
+// #define MAX_TIME 3
 /**********************************************************/
 Position gamePosition;		// Position we are going to use
 
@@ -126,11 +129,14 @@ int main( int argc, char ** argv )
 
 					//maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
-					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
+					// maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
 					// maxScore = alpha_beta1(tempPosition, MAX_DEPTH, -INFINITY, INFINITY, 1, &myMove);
 					//maxScore = iterativeDeepening(tempPosition, &myMove);
 					// MTDF(Position* aPosition, int f, char d, Move* finalMove)
-					maxScore = MTDFSearch(tempPosition, evaluationFunction(tempPosition) ,MAX_DEPTH, &myMove);
+					// maxScore = MTDFSearch(tempPosition, evaluationFunction(tempPosition) ,MAX_DEPTH, &myMove);
+
+					// int NegaScout(Position *gamePos, char depth, int alpha, int beta, Move* finalMove, int isRoot)
+					maxScore = NegaScout(tempPosition,MAX_DEPTH,-INFINITY, INFINITY, 1, &myMove);					
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
 
@@ -164,26 +170,27 @@ int main( int argc, char ** argv )
 /*
 	Jump cases using this function.
 */
-void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion*/,int i, int j, Position *gamePos){
+void multipleJumps(LinkedList* moveList, Move* move, short k /* depth of recursion*/,short i, short j, Position *gamePos){
 	
-	int jumpDir, playerDir;
+	//short jumpDir, playerDir;
+	
 
 	move->tile[0][k] = i;
 	move->tile[1][k] = j;
 
-	jumpDir = canJump(i, j, move->color, gamePos);
+	// jumpDir = canJump(i, j, move->color, gamePos);
+	MoveUtil.jumpDirection = canJump(i, j, move->color, gamePos);
 
-
-	playerDir = gamePos->turn == WHITE ? 1 : -1;
+	MoveUtil.playDirection = gamePos->turn == WHITE ? 1 : -1;
 
 	//Find all possible jumps recursively until no other jumps are available
-	switch(jumpDir)
+	switch(MoveUtil.jumpDirection)
 	{
 		case 1:
-			multipleJumps(moveList, move, k+1, i + 2*playerDir, j-2, gamePos);
+			multipleJumps(moveList, move, k+1, i + 2*MoveUtil.playDirection, j-2, gamePos);
 			return;
 		case 2:
-			multipleJumps(moveList, move, k+1, i + 2*playerDir, j+2, gamePos);
+			multipleJumps(moveList, move, k+1, i + 2*MoveUtil.playDirection, j+2, gamePos);
 			return;
 		case 3:	//Both left and right jumps are available, so duplicate move and move on both ways
 			{
@@ -191,8 +198,8 @@ void multipleJumps(LinkedList* moveList, Move* move, int k /* depth of recursion
 				memmove(newMove, move, sizeof(Move));
 
 				//following both left and right jump
-				multipleJumps(moveList, move, k+1, i + 2*playerDir, j-2, gamePos);
-				multipleJumps(moveList, newMove, k+1, i + 2*playerDir, j+2, gamePos);
+				multipleJumps(moveList, move, k+1, i + 2*MoveUtil.playDirection, j-2, gamePos);
+				multipleJumps(moveList, newMove, k+1, i + 2*MoveUtil.playDirection, j+2, gamePos);
 				return;
 			}
 		default:
@@ -224,7 +231,7 @@ void moveLegality(LinkedList* moveList, Move* move, Position* gamePos){
 /*
 	Function responsible to handle simple moves(both left and right)
 */
-void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playerDirection, int moveDirection){
+void simpleMove(LinkedList* moveList, Position *gamePos, short i, short j, short playerDirection, short moveDirection){
 	Move *move = (Move*)malloc(sizeof(Move));
 	move->color = gamePos->turn;
 	move->tile[0][0] = i;
@@ -243,7 +250,7 @@ void simpleMove(LinkedList* moveList, Position *gamePos, int i, int j, int playe
 */
 LinkedList* moveFinder(Position *gamePos) {
 	//todo change variables here
-	int i, j, jumpPossible = 0, movePossible = 0, playerDirection;
+	short i, j, jumpPossible = 0, playerDirection;
 	LinkedList* moveList = (LinkedList*)malloc(sizeof(LinkedList));
 
 	//Jump a simple initiallization
@@ -254,31 +261,31 @@ LinkedList* moveFinder(Position *gamePos) {
 
 
 	//Start iterating through the board to track all available moves
-	for( i = 0; i < BOARD_ROWS; i++ )
+	//UPDATED: Loop unrolling works fine
+	for( i = 0; i < BOARD_ROWS; i+=4 )
 	{
-		for( j = 0; j < BOARD_COLUMNS; j++)
+		for( j = 0; j < BOARD_COLUMNS; j+=4)
 			{
-				if( gamePos->board[ i ][ j ] != gamePos->turn ) continue;
-					
-					//From assignment we give priority to jumps than simple moves
-					if( canJump( i, j, gamePos->turn, gamePos ) ){
-						//printf("JUMP POSSIBLE\n");
-						if(!jumpPossible) deleteList(moveList); //any simple moves are deleted in case we find jump moves
-						
-						//In contrary with simple move we create move before and we pass as parameter. Everything needs to store in the same move
-						move = malloc(sizeof(Move));
-						memset(move,0,sizeof(Move));	//Valgrid stop shouting
-						move->color = gamePos->turn;
-						multipleJumps(moveList, move, 0, i, j, gamePos); 
-						jumpPossible = 1;
-					}else if((jumpPossible == 0)){ 
+				
+				jumpPossible = moveIterator(moveList, gamePos, move, i , j, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+1 , j, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+2 , j, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+3 , j, playerDirection,jumpPossible);
 
-						//Check both for left and right jump. In case we find a valid jump move add it to our list
-						simpleMove(moveList,gamePos,i,j, playerDirection,-1);
+				jumpPossible = moveIterator(moveList, gamePos, move, i , j+1, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+1 , j+1, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+2 , j+1, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+3 , j+1, playerDirection,jumpPossible);
 
-						simpleMove(moveList,gamePos,i,j, playerDirection,1);
-					
-					}
+				jumpPossible = moveIterator(moveList, gamePos, move, i , j+2, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+1 , j+2, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+2 , j+2, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+3 , j+2, playerDirection,jumpPossible);
+
+				jumpPossible = moveIterator(moveList, gamePos, move, i , j+3, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+1 , j+3, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+2 , j+3, playerDirection,jumpPossible);
+				jumpPossible = moveIterator(moveList, gamePos, move, i+3 , j+3, playerDirection,jumpPossible);
 				
 			}
 	}
@@ -294,7 +301,33 @@ LinkedList* moveFinder(Position *gamePos) {
 						
 }
 
-// //TODO will change that eventually
+short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, short j, short playerDirection, short jumpPossible){
+	if( gamePos->board[ i ][ j ] != gamePos->turn ) return jumpPossible;
+					
+	//From assignment we give priority to jumps than simple moves
+	if( canJump( i, j, gamePos->turn, gamePos ) ){
+		//printf("JUMP POSSIBLE\n");
+		if(!jumpPossible) deleteList(moveList); //any simple moves are deleted in case we find jump moves
+		
+		//In contrary with simple move we create move before and we pass as parameter. Everything needs to store in the same move
+		move = malloc(sizeof(Move));
+		memset(move,0,sizeof(Move));	//Valgrid stop shouting
+		move->color = gamePos->turn;
+		multipleJumps(moveList, move, 0, i, j, gamePos); 
+		jumpPossible = 1;
+	}else if((jumpPossible == 0)){ 
+
+		//Check both for left and right jump. In case we find a valid jump move add it to our list
+		simpleMove(moveList,gamePos,i,j, playerDirection,-1);
+
+		simpleMove(moveList,gamePos,i,j, playerDirection,1);
+	
+	}
+	return jumpPossible;
+}
+
+
+//TODO will change that eventually
 // int evaluationFunction (Position *aPosition) {
 //     int i,j, evaluation = 0;
     
@@ -305,20 +338,20 @@ LinkedList* moveFinder(Position *gamePos) {
 //             if (aPosition->board[i][j] == myColor){
 //                evaluation += 100;
 //                //printf("For piece in %d %d, of color: %d, we add...\n", i, j, myColor);
-//                if(myColor == WHITE)
-//                	evaluation += i*1;
-//                else
-//                	evaluation += (BOARD_ROWS-i-1)*1;
+//                // if(myColor == WHITE)
+//                // 	evaluation += i*1;
+//                // else
+//                // 	evaluation += (BOARD_ROWS-i-1)*1;
 
 
 //            	}
 //             else if (aPosition->board[i][j] == getOtherSide(myColor)){
 //                evaluation -= 100;
 //                //printf("For piece in %d %d, of color: %d, we sub...\n", i, j, getOtherSide(myColor));
-//                if(myColor == BLACK)
-//                	evaluation -= i*1;
-//                else
-//                	evaluation -= (BOARD_ROWS-i-1)*1;
+//                // if(myColor == BLACK)
+//                // 	evaluation -= i*1;
+//                // else
+//                // 	evaluation -= (BOARD_ROWS-i-1)*1;
 //            	}
 
 //         }
@@ -328,39 +361,61 @@ LinkedList* moveFinder(Position *gamePos) {
 //     return evaluation;
 // }
 
+int evaluationFunction(Position *gamePos){
+	int myCounterPieces=0,opponentCounterPieces=0,myKings=0,opponentKings=0,myCornerCounterPieces=0,opponentCornerCounterPieces=0;
+	int i=0,j=0;
+	int abs1=0,abs2=0;
+	int evaluation=0;
+	for(i = 0; i < BOARD_SIZE; i++ ){
+		for(j = 0; j < BOARD_SIZE; j++ ){
+			if(myColor==WHITE){
+				if( ( gamePos->board[ i ][ j ] == myColor ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
+					myCornerCounterPieces++;
+				}
+				else if( ( gamePos->board[ i ][ j ] == getOtherSide(myColor) ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
+					opponentCornerCounterPieces++;
+				}
+				else if(( gamePos->board[ i ][ j ] == myColor )){
+					myCounterPieces++;
+				}
+				else if(( gamePos->board[ i ][ j ] == getOtherSide(myColor) )){
+					opponentCounterPieces++;
+				}
+			}
+			else if(myColor==BLACK){
+				if( ( gamePos->board[ i ][ j ] == myColor ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
+					myCornerCounterPieces++;
+				}
+				else if( ( gamePos->board[ i ][ j ] == getOtherSide(myColor) ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
+					opponentCornerCounterPieces++;
+				}
+				else if(( gamePos->board[ i ][ j ] == myColor )){
+					myCounterPieces++;
+				}
+				else if(( gamePos->board[ i ][ j ] == getOtherSide(myColor) )){
+					opponentCounterPieces++;
+					
+				}
+			}
+		}
+	}
+	abs1=myCounterPieces*100+myCornerCounterPieces*120;
+	abs2=opponentCounterPieces*100+opponentCornerCounterPieces*120;	
+	evaluation=abs1-abs2 + ( gamePosition.score[ myColor ] * 140) - ( gamePosition.score[ getOtherSide( myColor ) ] * 140);
 
-//TODO will change that eventually
-int evaluationFunction (Position *aPosition) {
-    int i,j, evaluation = 0;
-    
-    for (i = 0; i < BOARD_ROWS; i++)
-    {
-        for ( j = 0; j < BOARD_COLUMNS; j++)
-        {
-            if (aPosition->board[i][j] == myColor){
-               evaluation += 100;
-               //printf("For piece in %d %d, of color: %d, we add...\n", i, j, myColor);
-               // if(myColor == WHITE)
-               // 	evaluation += i*1;
-               // else
-               // 	evaluation += (BOARD_ROWS-i-1)*1;
+	short myPiecesCount=0,opponentPiecesCount;
+	for(i = 0; i < BOARD_SIZE; i++ ){
+		for(j = 0; j < BOARD_SIZE; j++ ){
+			if(gamePos->board[i][j] == myColor){
+				myPiecesCount++;
+			}
+			else if(gamePos->board[i][j] == getOtherSide(myColor)){
+				opponentPiecesCount++;
+			}
+		}
+	}
 
-
-           	}
-            else if (aPosition->board[i][j] == getOtherSide(myColor)){
-               evaluation -= 100;
-               //printf("For piece in %d %d, of color: %d, we sub...\n", i, j, getOtherSide(myColor));
-               // if(myColor == BLACK)
-               // 	evaluation -= i*1;
-               // else
-               // 	evaluation -= (BOARD_ROWS-i-1)*1;
-           	}
-
-        }
-    }
-    evaluation = evaluation + aPosition->score[myColor]*90 - aPosition->score[getOtherSide(myColor)]*90;
-
-    return evaluation;
+	return evaluation;
 }
 
 int max(int num1, int num2){
@@ -386,7 +441,6 @@ Move initRandom(char myColor, Position *aPosition){
 	printAvailableMoves(moves);
 
 	removeFirst(moves);
-
 
 
 	if( myColor == WHITE )		// find movement's direction
@@ -499,8 +553,8 @@ Move initRandom(char myColor, Position *aPosition){
 	 Quiescence search attempts to mitigate the horizon effect(a problem in artificial intelligence which can occur when all moves from a given node in a game tree are searched to a fixed depth) 
 	 by extending the search depth in volatile positions where the heuristic value may have significant fluctuations between moves.
 */
-int quiescenceSearch(Position* gamePos){
-		int i, j, playerDirection;
+short quiescenceSearch(Position* gamePos){
+		short i, j, playerDirection;
 		//quiescence search
 		// determine if we have a jump available
 
@@ -524,65 +578,66 @@ int quiescenceSearch(Position* gamePos){
 		return FALSE;
 }
 
+//TODO SEE IF WE WANT TO ADD
 /*
 	https://stackoverflow.com/questions/41756443/how-to-implement-iterative-deepening-with-alpha-beta-pruning
 	TODO PASS TIME TO OUR ALPHA BETA IN CASE NO OTHER IMPLEMENTATion. TODO REVISIT THAT
 	https://github.com/nealyoung/CS171/blob/master/AI.java
 */
-int iterativeDeepeningSearch(Position* gamePos, Move* finalMove)
-{
-	int f = evaluationFunction(gamePos); //first guess TODO check that
-	char d=1;
-	// clock_t cstart = clock();
-	/*
-		Handle Time in C
-		https://stackoverflow.com/questions/19084596/how-to-use-seconds-time-in-c-program-as-a-counter
-	*/
-	clock_t startTime;
-	double timeElapsed;
+// int iterativeDeepeningSearch(Position* gamePos, Move* finalMove)
+// {
+// 	int f = evaluationFunction(gamePos); //first guess TODO check that
+// 	char d=1;
+// 	// clock_t cstart = clock();
+// 	/*
+// 		Handle Time in C
+// 		https://stackoverflow.com/questions/19084596/how-to-use-seconds-time-in-c-program-as-a-counter
+// 	*/
+// 	clock_t startTime;
+// 	double timeElapsed;
 
-	startTime = clock();
-	//TODO change that as well	
-	// while(1)
-	// {
+// 	startTime = clock();
+// 	//TODO change that as well	
+// 	// while(1)
+// 	// {
 
-	// 	// f = MTDF(aPosition, f, d, finalMove);
-	// 	f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
+// 	// 	// f = MTDF(aPosition, f, d, finalMove);
+// 	// 	f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
 
-	// 	timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
- //        if (timeElapsed >= MAX_TIME ||(d > MAX_DEPTH) ){
- //        	printf("Time timeElapsed\n");
- //           	printf("======================================================\n");
-	// 		printf("Max Score: %d\n", f);
-	// 		printf("Time used: %f\n", timeElapsed);
-	// 		printf("Depth of iteration: %d\n", d);
-	// 		printf("======================================================\n");
-	// 		break;
- //        }
+// 	// 	timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
+//  //        if (timeElapsed >= MAX_TIME ||(d > MAX_DEPTH) ){
+//  //        	printf("Time timeElapsed\n");
+//  //           	printf("======================================================\n");
+// 	// 		printf("Max Score: %d\n", f);
+// 	// 		printf("Time used: %f\n", timeElapsed);
+// 	// 		printf("Depth of iteration: %d\n", d);
+// 	// 		printf("======================================================\n");
+// 	// 		break;
+//  //        }
         
-	// 	d +=1;
+// 	// 	d +=1;
 
-	// }
-	// return f;
+// 	// }
+// 	// return f;
 
-	//NEW CHECK THAT
-	//https://homepages.cwi.nl/~paulk/theses/Carolus.pdf
-	for(d = 1; d <= MAX_DEPTH; d++){
-		f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
+// 	//NEW CHECK THAT
+// 	//https://homepages.cwi.nl/~paulk/theses/Carolus.pdf
+// 	for(d = 1; d <= MAX_DEPTH; d++){
+// 		f = alpha_beta(gamePos, d, -INFINITY, INFINITY, 1, finalMove, 1);
 
-		timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
-        if (timeElapsed >= MAX_TIME){
-        	printf("Time timeElapsed\n");
-           	printf("======================================================\n");
-			printf("Max Score: %d\n", f);
-			printf("Time used: %f\n", timeElapsed);
-			printf("Depth of iteration: %d\n", d);
-			printf("======================================================\n");
-			break;
-        }
-	}
-	return f;
-}
+// 		timeElapsed = (double)(clock() - startTime) / CLOCKS_PER_SEC;
+//         if (timeElapsed >= MAX_TIME){
+//         	printf("Time timeElapsed\n");
+//            	printf("======================================================\n");
+// 			printf("Max Score: %d\n", f);
+// 			printf("Time used: %f\n", timeElapsed);
+// 			printf("Depth of iteration: %d\n", d);
+// 			printf("======================================================\n");
+// 			break;
+//         }
+// 	}
+// 	return f;
+// }
 
 
 
@@ -623,6 +678,86 @@ int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove){
 	// free(aMove);;
 	return score;
 
+
+}
+
+/*
+	https://www.cs.unm.edu/~aaron/downloads/qian_search.pdf
+	https://www.chessprogramming.org/NegaScout
+
+*/
+int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove){
+	
+	int score,n;
+
+	//No quiescense search here. Sources mention that Negascout might need to re-search so we cannot expand further
+	if (depth <= 0){
+		return evaluationFunction(gamePos);
+	}
+
+	score = -INFINITY;
+	n = beta;
+
+	LinkedList *moveList = moveFinder(gamePos);   //finding all legal moves in this position
+	Move *tempData = NULL;
+
+
+	if (moveList == NULL || moveList->head == NULL){     //If no more moves available
+		deleteList(moveList);
+		return evaluationFunction(gamePos);
+	}
+
+	Position* tempPosition = malloc(sizeof(Position));
+	int cur;
+
+	while((tempData = removeFirst(moveList)) != NULL){ //for each child position
+
+		//printf("\t\tDepth %d, Alpha %d, Beta %d ,Start from (%d, %d) and go to (%d, %d) \n",depth, alpha, beta ,tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+		memmove(tempPosition, gamePos, sizeof(Position));
+		doMove(tempPosition, tempData);
+
+		cur = -NegaScout(gamePos, depth-1,-n,-alpha,0,finalMove);
+
+		if(cur > score){
+			if(n == beta || depth <=2 ){
+				if(isRoot){
+					memmove(finalMove, tempData, sizeof(Move));
+					//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+
+				}
+				score = cur;
+			}else{
+				score = -NegaScout(gamePos, depth-1,-beta,-cur,0,finalMove);
+			}
+		}
+
+		if(score > alpha) alpha = score;
+
+		if(alpha >= beta) return alpha;
+		n = alpha + 1;
+		
+
+		// tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, finalMove,0);
+
+		// if(value < tempScore){
+		//  	value = tempScore;
+		// 	if(isRoot){
+		// 		//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
+		// 		//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
+
+		// 		memmove(finalMove, tempData, sizeof(Move));
+		// 	}
+		// }
+
+		// alpha = max(alpha, value);
+		// if( beta <= alpha){ 
+		// 	free(tempData); 
+		// 	break;
+		// }
+		// free(tempData);
+	}
+	free(tempData);
+	return score;
 
 }
 
