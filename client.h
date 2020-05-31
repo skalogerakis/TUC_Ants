@@ -19,7 +19,7 @@ LinkedList* moveFinder(Position *gamePosition);
 void multipleJumps(LinkedList* moveList, Move* move, short k ,short i, short j, Position *gamePos);
 
 
-int evaluationFunction (Position *aPosition);
+short evaluationFunction (Position *aPosition);
 
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove, int isRoot);
 
@@ -39,7 +39,7 @@ int iterativeDeepeningSearch(Position* aPosition, Move* finalMove);
 
 int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove);
 
-int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove);
+short NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove);
 
 
 int max(int num1, int num2);
@@ -71,6 +71,8 @@ Move* removeFirst(LinkedList *myList );
 
 //void emptyList(LinkedList *myList);
 
+short evaluationCheck(Position *gamePos,short i, short j);
+
 
 
 short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, short j, short playerDirection, short jumpPossible);
@@ -83,3 +85,17 @@ struct
 	int playMoveDirection : 3;
 } MoveUtil;
 
+short tableHeuristics[12][8]={
+	{150, 150, 150 ,150 ,150, 150, 150, 150},
+	{70, 60, 60 ,60 ,60, 60, 60, 70},
+	{50, 40, 30 ,30 ,30, 30, 40, 50},
+	{50, 40, 30 ,20 ,20, 30, 40, 50},
+	{50, 40, 30 ,20 ,20, 30, 40, 50},
+	{50, 40, 30 ,20 ,20, 30, 40, 50},
+	{50, 40, 30 ,20 ,20, 30, 40, 50},
+	{50, 40, 30 ,20 ,20, 30, 40, 50},
+	{50, 40, 30 ,50 ,50, 30, 40, 50},
+	{50, 40, 30 ,30 ,30, 30, 40, 50},
+	{70, 60, 60 ,60 ,60, 60, 60, 70},
+	{150, 150, 150 ,150 ,150, 150, 150, 150},
+};

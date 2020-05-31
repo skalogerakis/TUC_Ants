@@ -327,95 +327,74 @@ short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, 
 }
 
 
-//TODO will change that eventually
-// int evaluationFunction (Position *aPosition) {
-//     int i,j, evaluation = 0;
+short evaluationFunction (Position *gamePos) {
+    short i,j, evaluation = 0;
     
-//     for (i = 0; i < BOARD_ROWS; i++)
-//     {
-//         for ( j = 0; j < BOARD_COLUMNS; j++)
-//         {
-//             if (aPosition->board[i][j] == myColor){
-//                evaluation += 100;
-//                //printf("For piece in %d %d, of color: %d, we add...\n", i, j, myColor);
-//                // if(myColor == WHITE)
-//                // 	evaluation += i*1;
-//                // else
-//                // 	evaluation += (BOARD_ROWS-i-1)*1;
+    for (i = 0; i < BOARD_ROWS; i+=4)
+    {
+        for ( j = 0; j < BOARD_COLUMNS; j+=4)
+        {
+        	evaluation+=evaluationCheck(gamePos,i,j);
+        	evaluation+=evaluationCheck(gamePos,i+1,j);
+        	evaluation+=evaluationCheck(gamePos,i+2,j);
+        	evaluation+=evaluationCheck(gamePos,i+3,j);
+
+        	evaluation+=evaluationCheck(gamePos,i,j+1);
+        	evaluation+=evaluationCheck(gamePos,i+1,j+1);
+        	evaluation+=evaluationCheck(gamePos,i+2,j+1);
+        	evaluation+=evaluationCheck(gamePos,i+3,j+1);
+
+        	evaluation+=evaluationCheck(gamePos,i,j+2);
+        	evaluation+=evaluationCheck(gamePos,i+1,j+2);
+        	evaluation+=evaluationCheck(gamePos,i+2,j+2);
+        	evaluation+=evaluationCheck(gamePos,i+3,j+2);
+
+        	evaluation+=evaluationCheck(gamePos,i,j+3);
+        	evaluation+=evaluationCheck(gamePos,i+1,j+3);
+        	evaluation+=evaluationCheck(gamePos,i+2,j+3);
+        	evaluation+=evaluationCheck(gamePos,i+3,j+3);
+        }
+    }
+    evaluation = evaluation + gamePos->score[myColor]*120 - gamePos->score[getOtherSide(myColor)]*120;
+    return evaluation;
+}
+
+short evaluationCheck(Position *gamePos,short i, short j){
+	short evaluation = 0,playerDirection = 0;
+
+	playerDirection = myColor == WHITE ? 1 : -1; 
+
+	if (gamePos->board[i][j] == myColor){
+       evaluation += 80;
+
+       if(i != 0 && i!= BOARD_ROWS-1 && j != 0 && j!= BOARD_COLUMNS-1){
+       		if(gamePos->board[i-playerDirection][j+1] == myColor){
+       			evaluation+=100;
+       		}
+       		if(gamePos->board[i-playerDirection][j-1] == myColor){
+       			evaluation+=100;
+       		}
+       }
+
+       evaluation+=tableHeuristics[i][j];
 
 
-//            	}
-//             else if (aPosition->board[i][j] == getOtherSide(myColor)){
-//                evaluation -= 100;
-//                //printf("For piece in %d %d, of color: %d, we sub...\n", i, j, getOtherSide(myColor));
-//                // if(myColor == BLACK)
-//                // 	evaluation -= i*1;
-//                // else
-//                // 	evaluation -= (BOARD_ROWS-i-1)*1;
-//            	}
+   	}
+    else if (gamePos->board[i][j] == getOtherSide(myColor)){
+      evaluation -= 80;
+      if(i != 0 && i!= BOARD_ROWS-1 && j != 0 && j!= BOARD_COLUMNS-1){
+       		if(gamePos->board[i-playerDirection][j+1] == getOtherSide(myColor)){
+       			evaluation-=150;
+       		}
+       		if(gamePos->board[i-playerDirection][j-1] == getOtherSide(myColor)){
+       			evaluation-=150;
+       		}
+       }
 
-//         }
-//     }
-//     evaluation = evaluation + aPosition->score[myColor]*90 - aPosition->score[getOtherSide(myColor)]*90;
+      evaluation-= tableHeuristics[i][j];
 
-//     return evaluation;
-// }
-
-int evaluationFunction(Position *gamePos){
-	int myCounterPieces=0,opponentCounterPieces=0,myKings=0,opponentKings=0,myCornerCounterPieces=0,opponentCornerCounterPieces=0;
-	int i=0,j=0;
-	int abs1=0,abs2=0;
-	int evaluation=0;
-	for(i = 0; i < BOARD_SIZE; i++ ){
-		for(j = 0; j < BOARD_SIZE; j++ ){
-			if(myColor==WHITE){
-				if( ( gamePos->board[ i ][ j ] == myColor ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
-					myCornerCounterPieces++;
-				}
-				else if( ( gamePos->board[ i ][ j ] == getOtherSide(myColor) ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
-					opponentCornerCounterPieces++;
-				}
-				else if(( gamePos->board[ i ][ j ] == myColor )){
-					myCounterPieces++;
-				}
-				else if(( gamePos->board[ i ][ j ] == getOtherSide(myColor) )){
-					opponentCounterPieces++;
-				}
-			}
-			else if(myColor==BLACK){
-				if( ( gamePos->board[ i ][ j ] == myColor ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
-					myCornerCounterPieces++;
-				}
-				else if( ( gamePos->board[ i ][ j ] == getOtherSide(myColor) ) && ( j!=BOARD_SIZE-1 ) && (j!=0) ){
-					opponentCornerCounterPieces++;
-				}
-				else if(( gamePos->board[ i ][ j ] == myColor )){
-					myCounterPieces++;
-				}
-				else if(( gamePos->board[ i ][ j ] == getOtherSide(myColor) )){
-					opponentCounterPieces++;
-					
-				}
-			}
-		}
-	}
-	abs1=myCounterPieces*100+myCornerCounterPieces*120;
-	abs2=opponentCounterPieces*100+opponentCornerCounterPieces*120;	
-	evaluation=abs1-abs2 + ( gamePosition.score[ myColor ] * 140) - ( gamePosition.score[ getOtherSide( myColor ) ] * 140);
-
-	short myPiecesCount=0,opponentPiecesCount;
-	for(i = 0; i < BOARD_SIZE; i++ ){
-		for(j = 0; j < BOARD_SIZE; j++ ){
-			if(gamePos->board[i][j] == myColor){
-				myPiecesCount++;
-			}
-			else if(gamePos->board[i][j] == getOtherSide(myColor)){
-				opponentPiecesCount++;
-			}
-		}
-	}
-
-	return evaluation;
+   	}
+   	return evaluation;
 }
 
 int max(int num1, int num2){
@@ -686,7 +665,7 @@ int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove){
 	https://www.chessprogramming.org/NegaScout
 
 */
-int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove){
+short NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove){
 	
 	int score,n;
 
@@ -708,7 +687,7 @@ int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Mo
 	}
 
 	Position* tempPosition = malloc(sizeof(Position));
-	int cur;
+	short cur;
 
 	while((tempData = removeFirst(moveList)) != NULL){ //for each child position
 
@@ -736,25 +715,6 @@ int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Mo
 		if(alpha >= beta) return alpha;
 		n = alpha + 1;
 		
-
-		// tempScore = alpha_beta(tempPosition, depth-1, alpha, beta, 0, finalMove,0);
-
-		// if(value < tempScore){
-		//  	value = tempScore;
-		// 	if(isRoot){
-		// 		//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
-		// 		//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
-
-		// 		memmove(finalMove, tempData, sizeof(Move));
-		// 	}
-		// }
-
-		// alpha = max(alpha, value);
-		// if( beta <= alpha){ 
-		// 	free(tempData); 
-		// 	break;
-		// }
-		// free(tempData);
 	}
 	free(tempData);
 	return score;
