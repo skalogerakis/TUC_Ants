@@ -39,7 +39,6 @@ char * ip = "127.0.0.1";	// default ip (local machine)
 //          --verbose \
 //          --log-file=valgrind-out.txt  ./client
 
-//TODO mess with bit improvements
 
 int main( int argc, char ** argv )
 {
@@ -129,13 +128,10 @@ int main( int argc, char ** argv )
 
 					//maxScore = minimax(tempPosition, MAX_DEPTH, TRUE, &myMove,1);
 
-					// maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
-					// maxScore = alpha_beta1(tempPosition, MAX_DEPTH, -INFINITY, INFINITY, 1, &myMove);
+					//maxScore = alpha_beta(tempPosition, MAX_DEPTH, maxScore, -maxScore, 1, &myMove,1 );
 					//maxScore = iterativeDeepening(tempPosition, &myMove);
-					// MTDF(Position* aPosition, int f, char d, Move* finalMove)
 					// maxScore = MTDFSearch(tempPosition, evaluationFunction(tempPosition) ,MAX_DEPTH, &myMove);
 
-					// int NegaScout(Position *gamePos, char depth, int alpha, int beta, Move* finalMove, int isRoot)
 					maxScore = NegaScout(tempPosition,MAX_DEPTH,-INFINITY, INFINITY, 1, &myMove);					
 
 					printf("\t\tMAX SCORE %d\n", maxScore);
@@ -170,15 +166,11 @@ int main( int argc, char ** argv )
 /*
 	Jump cases using this function.
 */
-void multipleJumps(LinkedList* moveList, Move* move, short k /* depth of recursion*/,short i, short j, Position *gamePos){
-	
-	//short jumpDir, playerDir;
-	
+void multipleJumps(LinkedList* moveList, Move* move, short k ,short i, short j, Position *gamePos){
 
 	move->tile[0][k] = i;
 	move->tile[1][k] = j;
 
-	// jumpDir = canJump(i, j, move->color, gamePos);
 	MoveUtil.jumpDirection = canJump(i, j, move->color, gamePos);
 
 	MoveUtil.playDirection = gamePos->turn == WHITE ? 1 : -1;
@@ -249,7 +241,7 @@ void simpleMove(LinkedList* moveList, Position *gamePos, short i, short j, short
 	Function responsible to track all available moves(Simple moves and jumps)
 */
 LinkedList* moveFinder(Position *gamePos) {
-	//todo change variables here
+
 	short i, j, jumpPossible = 0, playerDirection;
 	LinkedList* moveList = (LinkedList*)malloc(sizeof(LinkedList));
 
@@ -262,6 +254,7 @@ LinkedList* moveFinder(Position *gamePos) {
 
 	//Start iterating through the board to track all available moves
 	//UPDATED: Loop unrolling works fine
+	//THIS MAY SEEMS LIKE A BAD IDEA BUT ACTUALLY HELPED A LITTLE BIT
 	for( i = 0; i < BOARD_ROWS; i+=4 )
 	{
 		for( j = 0; j < BOARD_COLUMNS; j+=4)
@@ -290,13 +283,6 @@ LinkedList* moveFinder(Position *gamePos) {
 			}
 	}
 
-	// if(moveList==NULL){ //if we can't move
-	// 	move = malloc(sizeof(Move));
-	// 	move->color = aPosition->turn;
-	// 	move->tile[0][0] = -1;
-	// 	push(moveList, move);
-	// 	return moveList;
-	// }
 	return moveList;
 						
 }
@@ -306,7 +292,6 @@ short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, 
 					
 	//From assignment we give priority to jumps than simple moves
 	if( canJump( i, j, gamePos->turn, gamePos ) ){
-		//printf("JUMP POSSIBLE\n");
 		if(!jumpPossible) deleteList(moveList); //any simple moves are deleted in case we find jump moves
 		
 		//In contrary with simple move we create move before and we pass as parameter. Everything needs to store in the same move
@@ -326,10 +311,13 @@ short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, 
 	return jumpPossible;
 }
 
-
+/*
+	Evaluation Function. More action in evaluation check
+*/
 short evaluationFunction (Position *gamePos) {
     short i,j, evaluation = 0;
     
+    //Loop unrolling once again
     for (i = 0; i < BOARD_ROWS; i+=4)
     {
         for ( j = 0; j < BOARD_COLUMNS; j+=4)
@@ -359,11 +347,19 @@ short evaluationFunction (Position *gamePos) {
     return evaluation;
 }
 
+/*
+	The main actions regarding evaluations
+	Weight 
+		80 for each piece
+		+100 when our pieces are covered
+		-150 when enemy pieces are covered
+*/
 short evaluationCheck(Position *gamePos,short i, short j){
 	short evaluation = 0,playerDirection = 0;
 
 	playerDirection = myColor == WHITE ? 1 : -1; 
 
+	//Our player give positive evaluations
 	if (gamePos->board[i][j] == myColor){
        evaluation += 80;
 
@@ -377,9 +373,8 @@ short evaluationCheck(Position *gamePos,short i, short j){
        }
 
        evaluation+=tableHeuristics[i][j];
-
-
    	}
+   	//Opponent give negative evaluation
     else if (gamePos->board[i][j] == getOtherSide(myColor)){
       evaluation -= 80;
       if(i != 0 && i!= BOARD_ROWS-1 && j != 0 && j!= BOARD_COLUMNS-1){
@@ -621,8 +616,8 @@ short quiescenceSearch(Position* gamePos){
 
 
 /*
-	Also read for report
-	THIS USES WHAT WE WANT https://www.cs.unm.edu/~aaron/downloads/qian_search.pdf
+	Disappointing results
+	https://www.cs.unm.edu/~aaron/downloads/qian_search.pdf
 	https://en.wikipedia.org/wiki/MTD-f
 	https://www.chessprogramming.org/MTD(f)
 	https://people.csail.mit.edu/plaat/mtdf.html ALSO TIME ITERATIVE DEEEPENING
@@ -631,13 +626,10 @@ short quiescenceSearch(Position* gamePos){
 
 int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove){
 	int beta;
-	//int g = f;
-	//f = evaluationFunction(gamePos);
 	int score = f;
 	int upperBound = INFINITY;
 	int lowerBound = - INFINITY;
 
-	//Move* aMove = malloc(sizeof(Move));
 	do
 	{
 		if (score == lowerBound)
@@ -650,14 +642,11 @@ int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove){
 			upperBound = score;
 			
 		}else{ //keeping move
-			//memcpy(finalMove, aMove, sizeof(Move));
 			lowerBound = score;
 		}
 	}while(lowerBound < upperBound);
-	// free(aMove);;
+
 	return score;
-
-
 }
 
 /*
@@ -735,11 +724,11 @@ int alpha_beta(Position *gamePos, char depth, int alpha, int beta, char maximizi
 		}
 	}
 
-	LinkedList *moveList = moveFinder(gamePos);   //finding all legal moves in this position
+	LinkedList *moveList = moveFinder(gamePos);  //available moves
 	Move *tempData = NULL;
 
 
-	if (moveList == NULL || moveList->head == NULL){     //If no more moves available
+	if (moveList == NULL || moveList->head == NULL){     //Case no more moves available
 		deleteList(moveList);
 		return evaluationFunction(gamePos);
 	}
@@ -750,7 +739,7 @@ int alpha_beta(Position *gamePos, char depth, int alpha, int beta, char maximizi
 	if (maximizingPlayer){
 
 		value = -INFINITY;
-		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
+		while((tempData = removeFirst(moveList)) != NULL){ //for all ancestors
 
 			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 			memmove(tempPosition, gamePos, sizeof(Position));
@@ -761,7 +750,6 @@ int alpha_beta(Position *gamePos, char depth, int alpha, int beta, char maximizi
 			if(value < tempScore){
 			 	value = tempScore;
 				if(isRoot){
-					//printf("MAXIMIZER %d - TS: %d a: %d b: %d\n", depth, tempScore, alpha, beta);
 					//printf("FINALL MAX \t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
 					memmove(finalMove, tempData, sizeof(Move));
@@ -779,14 +767,12 @@ int alpha_beta(Position *gamePos, char depth, int alpha, int beta, char maximizi
 
 	}else{
 		value = INFINITY;
-		//b = beta;											//for each child position
-		while((tempData = removeFirst(moveList)) != NULL){ //for each child position
+		while((tempData = removeFirst(moveList)) != NULL){ //for all ancestors
 
 			//printf("\t\tStart from (%d, %d) and go to (%d, %d) \n", tempData->tile[0][0], tempData->tile[1][0], tempData->tile[0][1], tempData->tile[1][1]);
 
 			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, tempData);
-			//printf("MINIMIZER Searching Move on depth %d:\n", depth);			
 			value = min(value, alpha_beta(tempPosition, depth-1, alpha, beta, 1, finalMove, 0));
 			beta = min(beta, value);
 
@@ -800,10 +786,13 @@ int alpha_beta(Position *gamePos, char depth, int alpha, int beta, char maximizi
 	free(tempPosition);
 }
 
+/*
+	Minimax implementation
+	Based on pseudocode and ideas from those articles
+	https://en.wikipedia.org/wiki/Minimax
+	https://www.researchgate.net/figure/MiniMax-Algorithm-Pseduo-Code-In-Fig-3-there-is-a-pseudo-code-for-NegaMax-algorithm_fig2_262672371
+*/
 
-//Based on pseudocode and ideas from those articles
-//https://en.wikipedia.org/wiki/Minimax
-//https://www.researchgate.net/figure/MiniMax-Algorithm-Pseduo-Code-In-Fig-3-there-is-a-pseudo-code-for-NegaMax-algorithm_fig2_262672371
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot){
 
 	//In case we reach the depth we want return evaluation
@@ -811,11 +800,10 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 		return evaluationFunction(gamePos);
 	}
 
-
 	LinkedList *allMoves = moveFinder(gamePos);
 	Move* childData = NULL;
 
-	if (allMoves == NULL || allMoves->head == NULL){     //If for any reason, no more moves are available
+	if (allMoves == NULL || allMoves->head == NULL){     //Case no more moves are available
 		deleteList(allMoves);
 		return evaluationFunction(gamePos);
 	}
@@ -834,7 +822,6 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 			doMove(tempPosition, childData);
 
 			tempScore = max(value, minimax(tempPosition, depth - 1, FALSE, finalMove,0));
-			//printf("\tDepth %d and val %d\n", depth, value);
 
 			if(tempScore > value){
 				value = tempScore;
@@ -850,13 +837,10 @@ int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMov
 		value = INFINITY;
 		while((childData = removeFirst(allMoves)) != NULL){
 			// printf("MIN \t\tStart from (%d, %d) and go to (%d, %d) \n", childData->tile[0][0], childData->tile[1][0], childData->tile[0][1], childData->tile[1][1]);
-			//printf("depth %d and val %d\n", depth, value);
 			memmove(tempPosition, gamePos, sizeof(Position));
 			doMove(tempPosition, childData);
 
 			value = min(value, minimax(tempPosition, depth - 1, TRUE, finalMove,0));
-			//printf("\tDepth %d and val %d\n", depth, value);
-
 			free(childData);
 		}
 		return value;

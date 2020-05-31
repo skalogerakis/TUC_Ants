@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//TODO data is int type. Change after test that works fine
-
 typedef struct LinkedList LinkedList;
 
 struct LinkedList
