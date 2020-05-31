@@ -1,576 +1,985 @@
-==31101== Memcheck, a memory error detector
-==31101== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==31101== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==31101== Command: ./client
-==31101== Parent PID: 26086
-==31101== 
---31101-- 
---31101-- Valgrind options:
---31101--    --leak-check=full
---31101--    --show-leak-kinds=all
---31101--    --track-origins=yes
---31101--    --verbose
---31101--    --log-file=valgrind-out.txt
---31101-- Contents of /proc/version:
---31101--   Linux version 5.3.0-51-generic (buildd@lgw01-amd64-018) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #44~18.04.2-Ubuntu SMP Thu Apr 23 14:27:18 UTC 2020
---31101-- 
---31101-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
---31101-- Page sizes: currently 4096, max supported 4096
---31101-- Valgrind library directory: /usr/lib/valgrind
---31101-- Reading syms from /home/skalogerakis/TUC_Projects/TUC_Ants/client
---31101-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
---31101--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
---31101--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
---31101--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
---31101--   .. CRC is valid
---31101-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
---31101--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
---31101--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
---31101--    object doesn't have a symbol table
---31101--    object doesn't have a dynamic symbol table
---31101-- Scheduler: using generic scheduler lock implementation.
---31101-- Reading suppressions file: /usr/lib/valgrind/default.supp
-==31101== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-31101-by-skalogerakis-on-???
-==31101== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-31101-by-skalogerakis-on-???
-==31101== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-31101-by-skalogerakis-on-???
-==31101== 
-==31101== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==31101== don't want to do, unless you know exactly what you're doing,
-==31101== or are doing some strange experiment):
-==31101==   /usr/lib/valgrind/../../bin/vgdb --pid=31101 ...command...
-==31101== 
-==31101== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==31101==   /path/to/gdb ./client
-==31101== and then give GDB the following command
-==31101==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=31101
-==31101== --pid is optional if only one valgrind process is running
-==31101== 
---31101-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
---31101-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
---31101-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
---31101--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
---31101--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
---31101--    object doesn't have a symbol table
---31101-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
---31101--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
---31101--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
---31101--    object doesn't have a symbol table
-==31101== WARNING: new redirection conflicts with existing -- ignoring it
---31101--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x580608c1 ???
---31101--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
---31101-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
---31101-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
---31101-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
---31101--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
---31101--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
---31101--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
---31101--   .. CRC is valid
---31101-- REDIR: 0x4edac70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edaf50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edc7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edade0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edac10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edad40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ef80f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edafa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edb0e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed97c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ed9c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ee46c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edaff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edabe0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4ef8eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4eda050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edaf20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edaef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edc7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4edb040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---31101-- REDIR: 0x4fca3c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
---31101-- REDIR: 0x4fca590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
---31101-- REDIR: 0x4fca1d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
---31101-- REDIR: 0x4ed3070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
---31101-- REDIR: 0x4fcaab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
---31101-- REDIR: 0x4ed3950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
---31101-- REDIR: 0x4fcaad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
-==31101== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==31101==    at 0x4F5EC4D: send (send.c:28)
-==31101==    by 0x10D355: sendMove (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109062: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==  Address 0x1ffefffd31 is on thread 1's stack
-==31101==  in frame #1, created by sendMove (???:)
-==31101==  Uninitialised value was created by a heap allocation
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
---31101-- REDIR: 0x4ed6030 (libc.so.6:calloc) redirected to 0x4c31a70 (calloc)
-==31101== 
-==31101== HEAP SUMMARY:
-==31101==     in use at exit: 1,854,804 bytes in 109,827 blocks
-==31101==   total heap usage: 276,696 allocs, 166,869 frees, 5,410,673 bytes allocated
-==31101== 
-==31101== Searching for pointers to 109,827 not-freed blocks
-==31101== Checked 70,344 bytes
-==31101== 
-==31101== 24 bytes in 1 blocks are indirectly lost in loss record 1 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10950A: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 24 bytes in 1 blocks are indirectly lost in loss record 2 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10950A: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 26 bytes in 2 blocks are indirectly lost in loss record 3 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1094D1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 65 bytes in 5 blocks are indirectly lost in loss record 4 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 130 bytes in 10 blocks are indirectly lost in loss record 5 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1094D1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 130 bytes in 10 blocks are indirectly lost in loss record 6 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1094D1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 143 bytes in 11 blocks are definitely lost in loss record 7 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1094D1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 185 (120 direct, 65 indirect) bytes in 5 blocks are definitely lost in loss record 8 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 216 bytes in 9 blocks are indirectly lost in loss record 9 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 260 bytes in 20 blocks are definitely lost in loss record 10 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 288 bytes in 12 blocks are indirectly lost in loss record 11 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 507 bytes in 39 blocks are definitely lost in loss record 12 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 936 bytes in 39 blocks are indirectly lost in loss record 13 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 1,728 bytes in 72 blocks are definitely lost in loss record 14 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1095CD: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 2,002 bytes in 154 blocks are indirectly lost in loss record 15 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 3,601 bytes in 277 blocks are indirectly lost in loss record 16 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 4,238 bytes in 326 blocks are indirectly lost in loss record 17 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 4,511 bytes in 347 blocks are indirectly lost in loss record 18 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 4,862 bytes in 374 blocks are definitely lost in loss record 19 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 5,760 bytes in 240 blocks are indirectly lost in loss record 20 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 5,772 (3,432 direct, 2,340 indirect) bytes in 143 blocks are definitely lost in loss record 21 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 7,104 bytes in 296 blocks are indirectly lost in loss record 22 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 8,775 bytes in 675 blocks are indirectly lost in loss record 23 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 10,138 (720 direct, 9,418 indirect) bytes in 30 blocks are definitely lost in loss record 24 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 10,205 bytes in 785 blocks are indirectly lost in loss record 25 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 11,400 bytes in 475 blocks are indirectly lost in loss record 26 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 12,173 (888 direct, 11,285 indirect) bytes in 37 blocks are definitely lost in loss record 27 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 12,480 bytes in 520 blocks are indirectly lost in loss record 28 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 13,209 (8,328 direct, 4,881 indirect) bytes in 347 blocks are definitely lost in loss record 29 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 14,592 bytes in 608 blocks are definitely lost in loss record 30 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1095CD: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 14,911 bytes in 1,147 blocks are definitely lost in loss record 31 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 16,263 bytes in 1,251 blocks are definitely lost in loss record 32 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 21,978 (4,800 direct, 17,178 indirect) bytes in 200 blocks are definitely lost in loss record 33 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 23,348 bytes in 1,796 blocks are definitely lost in loss record 34 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 26,455 bytes in 2,035 blocks are definitely lost in loss record 35 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 28,028 bytes in 2,156 blocks are indirectly lost in loss record 36 of 54
-==31101==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10965D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 32,042 (6,360 direct, 25,682 indirect) bytes in 265 blocks are definitely lost in loss record 37 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 38,784 bytes in 1,616 blocks are definitely lost in loss record 38 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1095CD: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 48,763 bytes in 3,751 blocks are indirectly lost in loss record 39 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 54,262 bytes in 4,174 blocks are indirectly lost in loss record 40 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 71,952 bytes in 2,998 blocks are indirectly lost in loss record 41 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 80,142 (51,048 direct, 29,094 indirect) bytes in 2,127 blocks are definitely lost in loss record 42 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109581: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109682: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 87,984 bytes in 3,666 blocks are indirectly lost in loss record 43 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 96,005 bytes in 7,385 blocks are indirectly lost in loss record 44 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 106,444 bytes in 8,188 blocks are indirectly lost in loss record 45 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 110,088 bytes in 4,587 blocks are indirectly lost in loss record 46 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 115,944 bytes in 4,831 blocks are indirectly lost in loss record 47 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 131,387 (12,192 direct, 119,195 indirect) bytes in 508 blocks are definitely lost in loss record 48 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 161,838 (18,072 direct, 143,766 indirect) bytes in 753 blocks are definitely lost in loss record 49 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 198,768 bytes in 8,282 blocks are definitely lost in loss record 50 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1095CD: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 228,852 bytes in 17,604 blocks are definitely lost in loss record 51 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x10973A: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 240,266 bytes in 18,482 blocks are definitely lost in loss record 52 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 249,084 (67,152 direct, 181,932 indirect) bytes in 2,798 blocks are definitely lost in loss record 53 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109717: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== 327,117 (80,568 direct, 246,549 indirect) bytes in 3,357 blocks are definitely lost in loss record 54 of 54
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x109783: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A973: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x10A8D6: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== LEAK SUMMARY:
-==31101==    definitely lost: 1,063,419 bytes in 63,907 blocks
-==31101==    indirectly lost: 791,385 bytes in 45,920 blocks
-==31101==      possibly lost: 0 bytes in 0 blocks
-==31101==    still reachable: 0 bytes in 0 blocks
-==31101==         suppressed: 0 bytes in 0 blocks
-==31101== 
-==31101== ERROR SUMMARY: 103 errors from 27 contexts (suppressed: 0 from 0)
-==31101== 
-==31101== 77 errors in context 1 of 27:
-==31101== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
-==31101==    at 0x4F5EC4D: send (send.c:28)
-==31101==    by 0x10D355: sendMove (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109062: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==  Address 0x1ffefffd31 is on thread 1's stack
-==31101==  in frame #1, created by sendMove (???:)
-==31101==  Uninitialised value was created by a heap allocation
-==31101==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==31101==    by 0x1096C7: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109857: alpha_beta.part.0 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
-==31101== 
-==31101== ERROR SUMMARY: 103 errors from 27 contexts (suppressed: 0 from 0)
+==16512== Memcheck, a memory error detector
+==16512== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==16512== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==16512== Command: ./client
+==16512== Parent PID: 4326
+==16512== 
+--16512-- 
+--16512-- Valgrind options:
+--16512--    --leak-check=full
+--16512--    --show-leak-kinds=all
+--16512--    --track-origins=yes
+--16512--    --verbose
+--16512--    --log-file=valgrind-out.txt
+--16512-- Contents of /proc/version:
+--16512--   Linux version 5.3.0-53-generic (buildd@lgw01-amd64-016) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #47~18.04.1-Ubuntu SMP Thu May 7 13:10:50 UTC 2020
+--16512-- 
+--16512-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--16512-- Page sizes: currently 4096, max supported 4096
+--16512-- Valgrind library directory: /usr/lib/valgrind
+--16512-- Reading syms from /home/skalogerakis/TUC_Projects/TUC_Ants/client
+--16512-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--16512--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--16512--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
+--16512--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--16512--   .. CRC is valid
+--16512-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--16512--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--16512--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
+--16512--    object doesn't have a symbol table
+--16512--    object doesn't have a dynamic symbol table
+--16512-- Scheduler: using generic scheduler lock implementation.
+--16512-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==16512== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-16512-by-skalogerakis-on-???
+==16512== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-16512-by-skalogerakis-on-???
+==16512== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-16512-by-skalogerakis-on-???
+==16512== 
+==16512== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==16512== don't want to do, unless you know exactly what you're doing,
+==16512== or are doing some strange experiment):
+==16512==   /usr/lib/valgrind/../../bin/vgdb --pid=16512 ...command...
+==16512== 
+==16512== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==16512==   /path/to/gdb ./client
+==16512== and then give GDB the following command
+==16512==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=16512
+==16512== --pid is optional if only one valgrind process is running
+==16512== 
+--16512-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
+--16512-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
+--16512-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--16512--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--16512--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
+--16512--    object doesn't have a symbol table
+--16512-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--16512--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--16512--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
+--16512--    object doesn't have a symbol table
+==16512== WARNING: new redirection conflicts with existing -- ignoring it
+--16512--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x580608c1 ???
+--16512--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
+--16512-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
+--16512-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
+--16512-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--16512--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--16512--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
+--16512--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--16512--   .. CRC is valid
+--16512-- REDIR: 0x4edac70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edaf50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edc7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edade0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edac10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edad40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ef80f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edafa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edb0e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed97c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ed9c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ee46c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edaff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edabe0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4ef8eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4eda050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edaf20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edaef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edc7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4edb040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--16512-- REDIR: 0x4fca3c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
+--16512-- REDIR: 0x4fca590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
+--16512-- REDIR: 0x4fca1d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
+--16512-- REDIR: 0x4ed3070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
+--16512-- REDIR: 0x4fcaab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
+--16512-- REDIR: 0x4ed3950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
+--16512-- REDIR: 0x4fcaad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
+==16512== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==16512==    at 0x4F5EC4D: send (send.c:28)
+==16512==    by 0x10CF35: sendMove (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109062: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==  Address 0x1ffefffd31 is on thread 1's stack
+==16512==  in frame #1, created by sendMove (???:)
+==16512==  Uninitialised value was created by a heap allocation
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 
+==16512== HEAP SUMMARY:
+==16512==     in use at exit: 157,336,666 bytes in 7,137,480 blocks
+==16512==   total heap usage: 12,514,574 allocs, 5,377,094 frees, 232,138,717 bytes allocated
+==16512== 
+==16512== Searching for pointers to 7,137,480 not-freed blocks
+==16512== Checked 70,344 bytes
+==16512== 
+==16512== 96 bytes in 4 blocks are indirectly lost in loss record 1 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 192 bytes in 8 blocks are indirectly lost in loss record 2 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 208 bytes in 16 blocks are indirectly lost in loss record 3 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 288 bytes in 12 blocks are indirectly lost in loss record 4 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 312 bytes in 24 blocks are indirectly lost in loss record 5 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 416 bytes in 32 blocks are indirectly lost in loss record 6 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 480 bytes in 20 blocks are indirectly lost in loss record 7 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 592 (288 direct, 304 indirect) bytes in 12 blocks are definitely lost in loss record 8 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 624 bytes in 48 blocks are indirectly lost in loss record 9 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 672 bytes in 28 blocks are indirectly lost in loss record 10 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 740 (384 direct, 356 indirect) bytes in 16 blocks are definitely lost in loss record 11 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 832 bytes in 64 blocks are indirectly lost in loss record 12 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,036 (480 direct, 556 indirect) bytes in 20 blocks are definitely lost in loss record 13 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,056 bytes in 44 blocks are indirectly lost in loss record 14 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,128 bytes in 47 blocks are definitely lost in loss record 15 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,248 bytes in 96 blocks are indirectly lost in loss record 16 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,406 (672 direct, 734 indirect) bytes in 28 blocks are definitely lost in loss record 17 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,440 bytes in 60 blocks are indirectly lost in loss record 18 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,664 bytes in 128 blocks are indirectly lost in loss record 19 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,911 bytes in 147 blocks are indirectly lost in loss record 20 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,035 (864 direct, 1,171 indirect) bytes in 36 blocks are definitely lost in loss record 21 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,106 bytes in 162 blocks are indirectly lost in loss record 22 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,208 bytes in 92 blocks are indirectly lost in loss record 23 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,496 bytes in 192 blocks are indirectly lost in loss record 24 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1097A6: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,701 (1,248 direct, 1,453 indirect) bytes in 52 blocks are definitely lost in loss record 25 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 3,072 bytes in 128 blocks are indirectly lost in loss record 26 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 3,504 bytes in 146 blocks are indirectly lost in loss record 27 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 3,885 (1,632 direct, 2,253 indirect) bytes in 68 blocks are definitely lost in loss record 28 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 4,884 (2,400 direct, 2,484 indirect) bytes in 100 blocks are definitely lost in loss record 29 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1095C1: multipleJumps (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x1099A2: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 5,217 (384 direct, 4,833 indirect) bytes in 16 blocks are definitely lost in loss record 30 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 6,216 (456 direct, 5,760 indirect) bytes in 19 blocks are definitely lost in loss record 31 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 16,280 (3,384 direct, 12,896 indirect) bytes in 141 blocks are definitely lost in loss record 32 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 17,173 bytes in 1,321 blocks are indirectly lost in loss record 33 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 18,850 bytes in 1,450 blocks are indirectly lost in loss record 34 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 19,166 (4,032 direct, 15,134 indirect) bytes in 168 blocks are definitely lost in loss record 35 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 27,522 bytes in 278 blocks are definitely lost in loss record 36 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 27,522 bytes in 278 blocks are definitely lost in loss record 37 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 27,672 bytes in 1,153 blocks are indirectly lost in loss record 38 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 31,416 bytes in 1,309 blocks are indirectly lost in loss record 39 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 32,435 bytes in 2,495 blocks are indirectly lost in loss record 40 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 35,594 bytes in 2,738 blocks are indirectly lost in loss record 41 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 52,272 bytes in 2,178 blocks are indirectly lost in loss record 42 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 58,608 (6,384 direct, 52,224 indirect) bytes in 266 blocks are definitely lost in loss record 43 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 59,328 bytes in 2,472 blocks are indirectly lost in loss record 44 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 66,785 (7,608 direct, 59,177 indirect) bytes in 317 blocks are definitely lost in loss record 45 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 75,029 (7,800 direct, 67,229 indirect) bytes in 325 blocks are definitely lost in loss record 46 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 82,848 (14,472 direct, 68,376 indirect) bytes in 603 blocks are definitely lost in loss record 47 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 101,417 (33,456 direct, 67,961 indirect) bytes in 1,394 blocks are definitely lost in loss record 48 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 122,248 (39,624 direct, 82,624 indirect) bytes in 1,651 blocks are definitely lost in loss record 49 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 172,107 bytes in 13,239 blocks are indirectly lost in loss record 50 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 188,162 bytes in 14,474 blocks are indirectly lost in loss record 51 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 272,052 bytes in 2,748 blocks are definitely lost in loss record 52 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 272,052 bytes in 2,748 blocks are definitely lost in loss record 53 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 278,112 bytes in 11,588 blocks are indirectly lost in loss record 54 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 311,779 bytes in 23,983 blocks are indirectly lost in loss record 55 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 313,920 bytes in 13,080 blocks are indirectly lost in loss record 56 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 340,730 bytes in 26,210 blocks are indirectly lost in loss record 57 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 482,369 (60,528 direct, 421,841 indirect) bytes in 2,522 blocks are definitely lost in loss record 58 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 503,952 bytes in 20,998 blocks are indirectly lost in loss record 59 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 562,289 (71,640 direct, 490,649 indirect) bytes in 2,985 blocks are definitely lost in loss record 60 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 568,512 bytes in 23,688 blocks are indirectly lost in loss record 61 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 875,838 (73,752 direct, 802,086 indirect) bytes in 3,073 blocks are definitely lost in loss record 62 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 876,160 (310,224 direct, 565,936 indirect) bytes in 12,926 blocks are definitely lost in loss record 63 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 945,848 (133,032 direct, 812,816 indirect) bytes in 5,543 blocks are definitely lost in loss record 64 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,057,016 (361,464 direct, 695,552 indirect) bytes in 15,061 blocks are definitely lost in loss record 65 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,611,363 bytes in 123,951 blocks are indirectly lost in loss record 66 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 1,753,622 bytes in 134,894 blocks are indirectly lost in loss record 67 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,499,156 bytes in 25,244 blocks are definitely lost in loss record 68 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,499,156 bytes in 25,244 blocks are definitely lost in loss record 69 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,613,360 bytes in 108,890 blocks are indirectly lost in loss record 70 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,910,947 bytes in 223,919 blocks are indirectly lost in loss record 71 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 2,927,232 bytes in 121,968 blocks are indirectly lost in loss record 72 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 3,166,514 bytes in 243,578 blocks are indirectly lost in loss record 73 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 4,502,863 (559,920 direct, 3,942,943 indirect) bytes in 23,330 blocks are definitely lost in loss record 74 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 4,722,768 bytes in 196,782 blocks are indirectly lost in loss record 75 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 5,144,924 (651,288 direct, 4,493,636 indirect) bytes in 27,137 blocks are definitely lost in loss record 76 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 5,285,952 bytes in 220,248 blocks are indirectly lost in loss record 77 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 8,134,487 (2,914,896 direct, 5,219,591 indirect) bytes in 121,454 blocks are definitely lost in loss record 78 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 8,317,876 (672,936 direct, 7,644,940 indirect) bytes in 28,039 blocks are definitely lost in loss record 79 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 8,863,293 (1,212,840 direct, 7,650,453 indirect) bytes in 50,535 blocks are definitely lost in loss record 80 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 9,715,275 (3,303,960 direct, 6,411,315 indirect) bytes in 137,665 blocks are definitely lost in loss record 81 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 15,208,323 bytes in 1,169,871 blocks are indirectly lost in loss record 82 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 16,468,166 bytes in 1,266,782 blocks are indirectly lost in loss record 83 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109892: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 23,158,872 bytes in 233,928 blocks are definitely lost in loss record 84 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109FC0: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 24,772,944 bytes in 1,032,206 blocks are indirectly lost in loss record 85 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109A79: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 27,487,872 bytes in 1,145,328 blocks are indirectly lost in loss record 86 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x109AA9: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== 78,529,875 (6,221,256 direct, 72,308,619 indirect) bytes in 259,219 blocks are definitely lost in loss record 87 of 87
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x10970D: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x10A16D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== LEAK SUMMARY:
+==16512==    definitely lost: 45,430,764 bytes in 985,236 blocks
+==16512==    indirectly lost: 111,905,902 bytes in 6,152,244 blocks
+==16512==      possibly lost: 0 bytes in 0 blocks
+==16512==    still reachable: 0 bytes in 0 blocks
+==16512==         suppressed: 0 bytes in 0 blocks
+==16512== 
+==16512== ERROR SUMMARY: 86 errors from 40 contexts (suppressed: 0 from 0)
+==16512== 
+==16512== 47 errors in context 1 of 40:
+==16512== Syscall param socketcall.sendto(msg) points to uninitialised byte(s)
+==16512==    at 0x4F5EC4D: send (send.c:28)
+==16512==    by 0x10CF35: sendMove (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109062: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==  Address 0x1ffefffd31 is on thread 1's stack
+==16512==  in frame #1, created by sendMove (???:)
+==16512==  Uninitialised value was created by a heap allocation
+==16512==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16512==    by 0x1098ED: moveFinder (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109F9D: NegaScout.part.2 (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512==    by 0x109130: main (in /home/skalogerakis/TUC_Projects/TUC_Ants/client)
+==16512== 
+==16512== ERROR SUMMARY: 86 errors from 40 contexts (suppressed: 0 from 0)

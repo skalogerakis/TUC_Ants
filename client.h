@@ -10,7 +10,7 @@
 *************************************************/
 int alpha_beta(Position *aPosition, char depth, int alpha, int beta, char maximizingPlayer, Move* finalMove, int isRoot);
 
-short quiescenceSearch(Position* gamePos);
+int quiescenceSearch(Position* gamePos);
 
 int minimax(Position *gamePos, int depth, int ismaximizingPlayer, Move* finalMove, int isRoot);
 
@@ -18,7 +18,7 @@ int iterativeDeepeningSearch(Position* aPosition, Move* finalMove);
 
 int MTDFSearch(Position* gamePos, int f, int d, Move* finalMove);
 
-short NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove);
+int NegaScout(Position *gamePos, char depth, int alpha, int beta, int isRoot, Move* finalMove);
 
 //Not much action here, simply the initial random implementation in a new function
 Move initRandom(char myColor, Position *aPosition);
@@ -32,11 +32,10 @@ LinkedList* moveFinder(Position *gamePosition);
 
 void multipleJumps(LinkedList* moveList, Move* move, short k ,short i, short j, Position *gamePos);
 
-short evaluationFunction (Position *aPosition);
+int evaluationFunction (Position *aPosition);
 
-short evaluationCheck(Position *gamePos,short i, short j);
+int evaluationCheck(Position *gamePos,short i, short j);
 
-short moveIterator(LinkedList* moveList,Position* gamePos, Move* move ,short i, short j, short playerDirection, short jumpPossible);
 
 void simpleMove(LinkedList* moveList, Position *gamePos, short i, short j, short playerDirection, short moveDirection);
 
